@@ -18,8 +18,9 @@ def surrounded_property(x, y, turn, list_property, board_size):
     return sided_square, direction
 
 
-def create_buttons(coord_buttons, button_color, button_function, button_text, click, mx, my, win, font, language):
+def create_buttons(coord_buttons, button_color, button_text, click, mx, my, win, font):
     buttons = []
+    button_ind = None
     for n_button in range(len(coord_buttons)):
         coord = coord_buttons[n_button]
         buttons += [pygame.Rect(coord)]
@@ -29,8 +30,8 @@ def create_buttons(coord_buttons, button_color, button_function, button_text, cl
         draw_text_centered(text, font, (0, 0, 0), win, coord[0]+coord[2]/2, coord[1]+coord[3]/2)
         if button.collidepoint((mx, my)):
             if click:
-                function_name = button_function[n_button]
-                eval(f'{function_name}"{language}")')
+                button_ind = n_button
+    return button_ind, click
 
 
 def draw_text_centered(text, font, color, surface, x, y):
@@ -47,7 +48,7 @@ def draw_text_top_left(text, font, color, surface, x, y):
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
 
-def conf_menu(screenshot, mx, my, conf_text, window_x, window_y, language, screen):
+def conf_menu(screen, mx, my, conf_text, window_x, window_y, language):
     clock = pygame.time.Clock()
     black = (0, 0, 0)
     x = mx
@@ -84,12 +85,12 @@ def conf_menu(screenshot, mx, my, conf_text, window_x, window_y, language, scree
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
-        pygame.draw.rect(screenshot, (100, 100, 100), confirm_button)
-        pygame.draw.rect(screenshot, (100, 100, 100), pass_button)
-        pygame.draw.rect(screenshot, (100, 100, 100), canc_button)
-        pygame.draw.rect(screenshot, (0, 0, 0), confirm_button, 2)
-        pygame.draw.rect(screenshot, (0, 0, 0), pass_button, 2)
-        pygame.draw.rect(screenshot, (0, 0, 0), canc_button, 2)
+        pygame.draw.rect(screen, (100, 100, 100), confirm_button)
+        pygame.draw.rect(screen, (100, 100, 100), pass_button)
+        pygame.draw.rect(screen, (100, 100, 100), canc_button)
+        pygame.draw.rect(screen, (0, 0, 0), confirm_button, 2)
+        pygame.draw.rect(screen, (0, 0, 0), pass_button, 2)
+        pygame.draw.rect(screen, (0, 0, 0), canc_button, 2)
         draw_text_centered(conf_text, font_conf, black, screen, x+50, y+15)
         if language == 'Spanish':
             draw_text_centered("Pasar", font_conf, black, screen, x+50, y+45)

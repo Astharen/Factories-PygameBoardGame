@@ -1,32 +1,30 @@
 from general_use import surrounded_property
 
-def buy_surrounding_goal(goal, list_property, board_size, exploration_price, turn, current_profit, wood, list_color_map, bought, cash, recursed_map, n_paths, wood_profit):
+def creating_goal_graph(goal, list_property, board_size, turn, recursed_map, list_possible_tiles):
     y = goal[1]
     x = goal[0]
-    key = str(x) + str(y)
-    recursed_map[key] = 0
+    main_key = str(x) + str(y)
+    recursed_map[main_key] = []
+    continuo_recusing = True
     for y_sur in range(y-1,y+2):
-        y_sur = min(y_sur, board_size[0]-1)
+        y_sur = min(y_sur, board_size[1]-1)
         y_sur = max(y_sur, 0)
         side_squared, _ = surrounded_property(x, y_sur, turn, list_property, board_size)
         key = str(x) + str(y_sur)
         
         if key not in recursed_map.keys():
-            recursed_map[key] = n_paths
-            n_paths += 1
-            if side_squared and not bought and list_property[y_sur][x]=='0':
-                bought = True
-                list_property[y_sur][x] = str(turn)
-                cash[str(turn)] -= exploration_price
-                if list_color_map[y_sur][x] == '1':
-                    wood[str(turn)] += 1
-                    current_profit[str(turn)] += wood_profit
-            else:
-                if not bought:
-                    new_square = [x, y_sur]
-                    if new_square!=goal:
-                        list_property, current_profit, wood, cash, bought, recursed_map = buy_surrounding_goal(new_square, list_property, board_size, exploration_price, turn, current_profit, wood, list_color_map, bought, cash, recursed_map, n_paths)
+            recursed_map[key] = []
+        if main_key!=key and key not in recursed_map[main_key]:
+            recursed_map[main_key].append(key)
+        if side_squared and list_property[y_sur][x]=='0' and key not in list_possible_tiles:
+            list_possible_tiles.append(key)
 
+        if y_sur == 0 or y_sur == board_size[1] - 1:
+            break
+        if not side_squared or list_property[y_sur][x]!='0':
+            new_square = [x, y_sur]
+            if new_square!=goal and main_key not in recursed_map[key]:
+                recursed_map, list_possible_tiles = creating_goal_graph(new_square, list_property, board_size, turn, recursed_map, list_possible_tiles)
 
     for x_sur in range(x-1, x+2):
         x_sur = min(x_sur, board_size[0]-1)
@@ -35,24 +33,75 @@ def buy_surrounding_goal(goal, list_property, board_size, exploration_price, tur
         key = str(x_sur) + str(y)
 
         if key not in recursed_map.keys():
-            recursed_map[key] = n_paths
-            n_paths += 1
+            recursed_map[key] = []
+        if main_key!=key and key not in recursed_map[main_key]:
+            recursed_map[main_key].append(key)
+        
+        if side_squared and list_property[y][x_sur]=='0' and key not in list_possible_tiles:
+            list_possible_tiles.append(key)
+        
+        if x_sur == 0 or x_sur == board_size[0] - 1:
+            break
+        if not side_squared or list_property[y][x_sur]!='0':
+            new_square = [x_sur, y]
+            if new_square!=goal and main_key not in recursed_map[key]:
+                recursed_map, list_possible_tiles = creating_goal_graph(new_square, list_property, board_size, turn, recursed_map, list_possible_tiles)
 
-            if side_squared and not bought and list_property[y][x_sur]=='0':
-                bought = True
-                list_property[y][x_sur] = str(turn)
-                cash[str(turn)] -= exploration_price
-                if list_color_map[y][x_sur] == '1':
-                    wood[str(turn)] += 1
-                    current_profit[str(turn)] += wood_profit
-            else:
-                if not bought:
-                    new_square = [x_sur, y]
-                    if new_square!=goal:
-                        list_property, current_profit, wood, cash, bought, recursed_map = buy_surrounding_goal(new_square, list_property, board_size, exploration_price, 
-                        turn, current_profit, wood, list_color_map, bought, cash, recursed_map, n_paths)
+    return recursed_map, list_possible_tiles
 
-    return list_property, current_profit, wood, cash, bought, recursed_map
+def bfs_shortest_path(graph, start, goal):
+
+    explored = []
+    queue = [[start]]
+    possible_paths = []
+    bought = False
+
+    while queue:
+        path = queue.pop(0)
+        node = path[-1]
+        if node not in explored:
+            neighbours = graph[node]
+            for neighbour in neighbours:
+                new_path = list(path)
+                new_path.append(neighbour)
+                queue.append(new_path)
+                if neighbour == goal:
+                    bought = True
+                    return new_path, bought
+
+            explored.append(node)
+    return [], bought
+
+def buying_nearest_tile(position_tile, list_property, board_size, exploration_price, turn, current_profit, wood, list_color_map, cash, wood_profit):
+    list_property[position_tile[1]][position_tile[0]] = str(turn)
+    cash[str(turn)] -= exploration_price
+    if list_color_map[position_tile[1]][position_tile[0]] == '1':
+        wood[str(turn)] += 1
+        current_profit[str(turn)] += wood_profit
+
+    return list_property, current_profit, wood, cash
+
+def looking_for_shortest_path(recursed_map, list_possible_tiles, goal, list_color_map):
+    ind = 0
+    final_ind = 0
+    min_path = 0
+    final_bought = False
+    for tile in list_possible_tiles:
+        start = str(goal[0]) + str(goal[1])
+        finish_tile = tile
+        new_path, bought = bfs_shortest_path(recursed_map, start, finish_tile)
+        len_path = len(new_path)
+        if len_path < min_path:
+            min_path = len_path
+            final_ind = ind
+        elif len_path == min_path:
+            if list_color_map[int(tile[1])][int(tile[0])] == '1':
+                min_path = len_path
+                final_ind = ind
+        ind += 1
+        if bought:
+            final_bought = True
+    return [int(list_possible_tiles[final_ind][0]), int(list_possible_tiles[final_ind][1])], final_bought
 
 
 def movement_IA(possible_squares, list_property, list_color_map, board_size, turn, cash, goal_price,
@@ -75,8 +124,10 @@ def movement_IA(possible_squares, list_property, list_color_map, board_size, tur
         if not sided_square and current_profit[str(turn)]>20:
             if not goal_enclosed:
                 bought = False
-                list_property, current_profit, wood, cash, bought, recursed_map, _ = buy_surrounding_goal(goal, list_property, board_size, exploration_price, turn, 
-                current_profit, wood, list_color_map, bought, cash, recursed_map = {}, n_paths=0)
+                recursed_map, list_possible_tiles = creating_goal_graph(goal, list_property, board_size, turn, recursed_map={}, list_possible_tiles=[])
+                position_tile, bought = looking_for_shortest_path(recursed_map, list_possible_tiles, goal, list_color_map)
+                list_property, current_profit, wood, cash = buying_nearest_tile(position_tile, list_property, board_size, exploration_price, turn, current_profit, wood, list_color_map, cash, wood_profit)
+
                 if not bought:
                     goal_enclosed = True
                 else:

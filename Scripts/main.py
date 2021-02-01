@@ -6,7 +6,7 @@ import json
 
 from general_use import surrounded_property, draw_text_centered, draw_text_top_left, conf_menu, create_buttons
 from draw import draw_top_side, draw_leyend, draw_map
-from AI import movement_IA, get_possible_square
+from AI import get_possible_square, movement_IA 
 
 window_x = 500
 window_y = 500
@@ -168,8 +168,8 @@ def main_loop(ia, language):
 
     n = 0
     equal = True
-    goal_y = int((first_y2+first_y1)/2)
-    goal_x = int((first_x2+first_x1)/2)
+    goal_y = int((first_y2+first_y1)/2) + random.randint(0,1)
+    goal_x = int((first_x2+first_x1)/2) + random.randint(0,1)
     step = 1
     while equal:
         if ([goal_x, goal_y]!=[first_x2, first_y2]) and ([goal_x, goal_y]!=[first_x1, first_y1]):
@@ -225,9 +225,9 @@ def main_loop(ia, language):
                         if sided_square:
                             #screenshot = pygame.display.get_surface()
                             if language == 'Spanish':
-                                confirm, conf_pass = conf_menu(screen, mx, my, 'Explorar:  ' + str(exploration_price), window_x, window_y, language, screen)
+                                confirm, conf_pass = conf_menu(screen, mx, my, 'Explorar:  ' + str(exploration_price), window_x, window_y, language)
                             elif language == 'English':
-                                confirm, conf_pass = conf_menu(screen, mx, my, 'Explore:  ' + str(exploration_price), window_x, window_y, language, screen)
+                                confirm, conf_pass = conf_menu(screen, mx, my, 'Explore:  ' + str(exploration_price), window_x, window_y, language)
                             if confirm and cash[str(turn)]>=exploration_price:
                                 action += 1
                                 list_property[y][x] = str(turn)
@@ -288,6 +288,7 @@ def main_loop(ia, language):
         pygame.display.update()
 
 
+
 def main_menu():
     run = True
     click = False
@@ -296,13 +297,13 @@ def main_menu():
     while True:
         screen.fill(background_main_menu_color)
         draw_text_centered('Main menu', font, (0, 0, 0), screen, 250, 50)
+        click = False
         mx, my = pygame.mouse.get_pos()
         if language=='English':
             button_text = english_button
         if language == 'Spanish':
             button_text = spanish_button
-        create_buttons(coord_buttons, button_color, button_function, button_text, click, mx, my, screen, font, language)
-        click = False
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -314,6 +315,12 @@ def main_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
+        
+        n_button, click = create_buttons(coord_buttons, button_color, button_text, click, mx, my, screen, font)
+
+        if click:
+            function_name = button_function[n_button]
+            eval(f'{function_name}"{language}")')
 
         font_lang = pygame.font.SysFont(None, 30)
 
