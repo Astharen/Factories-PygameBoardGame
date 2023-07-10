@@ -21,6 +21,7 @@ def surrounded_property(x, y, turn, list_property, board_size):
 def create_buttons(coord_buttons, button_color, button_text, click, mx, my, win, font):
     buttons = []
     button_ind = None
+    main_button_click = False
     for n_button in range(len(coord_buttons)):
         coord = coord_buttons[n_button]
         buttons += [pygame.Rect(coord)]
@@ -28,10 +29,10 @@ def create_buttons(coord_buttons, button_color, button_text, click, mx, my, win,
         pygame.draw.rect(win, button_color, button)
         text = button_text[n_button]
         draw_text_centered(text, font, (0, 0, 0), win, coord[0]+coord[2]/2, coord[1]+coord[3]/2)
-        if button.collidepoint((mx, my)):
-            if click:
-                button_ind = n_button
-    return button_ind, click
+        if button.collidepoint((mx, my)) and click:
+            button_ind = n_button
+            main_button_click = True
+    return button_ind, main_button_click
 
 
 def draw_text_centered(text, font, color, surface, x, y):
