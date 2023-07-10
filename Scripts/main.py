@@ -316,9 +316,10 @@ def main_menu():
                 if event.button == 1:
                     click = True
         
-        n_button, click = create_buttons(coord_buttons, button_color, button_text, click, mx, my, screen, font)
+        n_button, main_buttons_click = create_buttons(coord_buttons, button_color, button_text, click, mx, my,
+                                                      screen, font)
 
-        if click:
+        if main_buttons_click:
             function_name = button_function[n_button]
             eval(f'{function_name}"{language}")')
 
