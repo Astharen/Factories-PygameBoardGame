@@ -18,9 +18,10 @@ class Board(ABC):
         for y in range(board_size[1]):
             tile_mapping_x = []
             for x in range(board_size[0]):
-                self.add_tile()
+                tile = self.get_position_tile(x, y)
+                tile_mapping_x.append(tile)
             self.tile_mapping.append(tile_mapping_x)
 
     @abstractmethod
-    def add_tile(self):
+    def get_position_tile(self, x, y):
         pass
