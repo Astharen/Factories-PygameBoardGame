@@ -1,18 +1,12 @@
 from abc import ABC, abstractmethod
+from typing import List
 
 from data.constants import board_size
 
 
 class Board(ABC):
 
-    @property
-    @abstractmethod
-    def tile_mapping(self):
-        pass
-
-    @tile_mapping.setter
-    def tile_mapping(self, value):
-        self.tile_mapping = value
+    tile_mapping: List
 
     def create_board(self):
         for y in range(board_size[1]):
