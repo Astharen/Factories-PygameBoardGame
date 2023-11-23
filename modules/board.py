@@ -1,7 +1,6 @@
-import random
 from abc import ABC, abstractmethod
 
-from data.constants import n_divisions, board_size
+from data.constants import board_size
 
 
 class Board(ABC):
