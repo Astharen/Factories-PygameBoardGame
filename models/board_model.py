@@ -2,7 +2,7 @@ import random
 
 from data.constants import board_size, n_divisions
 from modules.board import Board
-from modules.tile import Tile
+from models.tile import Tile
 
 
 class BoardModel(Board):

@@ -1,6 +1,6 @@
 import json
 
-from modules.board_model import Board
+from models.board_model import Board
 
 
 class Game:
@@ -12,7 +12,6 @@ class Game:
          self.initial_cash, self.goal_price) = self.get_game_parameters()
 
         self.ended_game = False
-
 
     @staticmethod
     def get_game_parameters():

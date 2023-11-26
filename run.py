@@ -1,6 +1,6 @@
-from modules.game import Model
+from models.game import Model
 from modules.view import View
-from modules.presenter import Presenter
+from presenters.presenter import Presenter
 from modules.player import Player
 
 
