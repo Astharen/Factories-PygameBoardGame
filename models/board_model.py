@@ -2,7 +2,7 @@ import random
 
 from data.constants import board_size, n_divisions
 from modules.board import Board
-from models.tile import Tile
+from models.tile_model import TileModel
 
 
 class BoardModel(Board):
@@ -23,9 +23,9 @@ class BoardModel(Board):
 
     def _get_position_tile(self, x, y):
         if (board_size[0] * y + x + 1) in self.wood_squares:
-            return Tile(x, y, "1")
+            return TileModel(x, y, "1")
         else:
-            return Tile(x, y, "0")
+            return TileModel(x, y, "0")
 
     @staticmethod
     def _calc_init_player_pos():

@@ -1,4 +1,4 @@
-class Tile:
+class TileModel:
 
     def __init__(self, x, y, tile_type):
         self.x = x
