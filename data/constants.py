@@ -23,5 +23,4 @@ coord_buttons = [(100, 120, 300, 80), (100, 250, 300, 80)]
 
 button_function = ["main_loop(True,", "main_loop(False,"]
 
-spanish_button_text = ["vs IA", "2 jugadores"]
-english_button_text = ["vs AI", "2 players"]
+button_text = {'English': ["vs AI", "2 players"], 'Spanish': ["vs IA", "2 jugadores"]}
