@@ -1,8 +1,8 @@
 import random
 
 from data.constants import board_size, n_divisions
-from modules.board import Board
-from models.tile_model import TileModel
+from abstract_classes.board import Board
+from models.game.tile_model import TileModel
 
 
 class BoardModel(Board):

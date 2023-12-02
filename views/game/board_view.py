@@ -1,6 +1,6 @@
 from data.constants import board_size, window_x, window_y, square_size, space_between_squares
-from modules.board import Board
-from views.tile_view import TileView
+from abstract_classes.board import Board
+from views.game.tile_view import TileView
 
 
 class BoardView(Board):
