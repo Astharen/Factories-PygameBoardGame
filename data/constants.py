@@ -12,7 +12,7 @@ board_size = [8, 8]
 space_between_squares = 3
 n_divisions = 4
 
-with open('color_mapping.txt', 'r') as outfile:
+with open('data/color_mapping.txt', 'r') as outfile:
     color_mapping = json.load(outfile)
 
 dict_square_col = {'0': color_mapping['nothing_color'], '1': color_mapping['wood_color'],
