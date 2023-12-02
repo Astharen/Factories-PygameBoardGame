@@ -4,11 +4,6 @@ from data.constants import button_text_all_lang
 
 class MainMenuPresenter(Presenter):
 
-    def __init__(self, model, app):
-        super().__init__(model)
-        self.window_name = 'main_menu'
-        self.app = app
-
     def set_view(self, view):
         super().set_view(view)
         view.start()

@@ -10,9 +10,7 @@ from data.constants import button_text_all_lang, color_mapping, font, button_fun
 class MainMenuView(View):
 
     def __init__(self, screen, clock):
-        super().__init__()
-        self.screen = screen
-        self.clock = clock
+        super().__init__(screen, clock)
         self.button_text = None
         self.language = None
 
