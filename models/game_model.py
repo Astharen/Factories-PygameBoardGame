@@ -23,12 +23,13 @@ class GameModel:
         self.turn = random.randint(1, len(self.players))
 
     def set_players(self, vs_ia):
-        self.players.append(Player('1'))
-        self.players.append(Player('2'))
+        self.add_player(Player('1'))
+        self.add_player(Player('2'))
 
         for player in self.players:
             player_init_tile = self.board.calc_init_player_tile()
-            player.start(initial_tile=player_init_tile, cash=self.game_parameters['initial_cash'])
+            player.start(cash=self.game_parameters['initial_cash'])
+            self.board.set_tile_to_a_player(player_init_tile, player)
 
     @staticmethod
     def get_game_parameters():
@@ -39,5 +40,3 @@ class GameModel:
 
     def add_player(self, player):
         self.players.append(player)
-
-    # Other model-related logic and game state management

@@ -7,9 +7,11 @@ class Player:
         self.cash = None
         self.current_profit = None
 
-    def start(self, initial_tile, cash):
-        self.owned_tiles.append(initial_tile)
+    def start(self, cash):
         self.cash = cash
         self.wood = 0
         self.factory = 0
         self.current_profit = 0
+
+    def add_tile(self, tile):
+        self.owned_tiles.append(tile)

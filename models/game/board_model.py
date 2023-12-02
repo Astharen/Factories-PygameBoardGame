@@ -23,11 +23,22 @@ class BoardModel(Board):
 
     def _get_position_tile(self, x, y):
         if (board_size[0] * y + x + 1) in self.wood_squares:
-            return TileModel(x, y, "1")
+            return TileModel(x, y, '1')
         else:
-            return TileModel(x, y, "0")
+            return TileModel(x, y, '0')
+
+    @staticmethod
+    def set_tile_to_a_player(tile, player):
+        tile.set_owner(player)
+        player.add_tile(tile)
 
     def calc_init_player_tile(self):
-        first_x = random.randint(0, board_size[0] - 1)
-        first_y = random.randint(0, board_size[1] - 1)
-        return self.tile_mapping[first_x][first_y]
+        not_end = True
+        first_tile = None
+        while not_end:
+            first_x = random.randint(0, board_size[0] - 1)
+            first_y = random.randint(0, board_size[1] - 1)
+            first_tile = self.tile_mapping[first_x][first_y]
+            if first_tile.type == '0' and first_tile.owner is None:
+                not_end = False
+        return first_tile
