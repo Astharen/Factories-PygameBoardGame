@@ -46,3 +46,31 @@ class BoardModel(Board):
             if first_tile.type == '0' and first_tile.owner is None:
                 not_end = False
         return first_tile
+
+    def set_goal_tile(self, players_initial_tiles):
+        n = 0
+        is_goal_not_found = True
+        first_x = [player_init_tile.x for player_init_tile in players_initial_tiles]
+        first_y = [player_init_tile.y for player_init_tile in players_initial_tiles]
+        goal_x = int(sum(first_x) / len(first_x)) + random.randint(0, 1)
+        goal_y = int(sum(first_y) / len(first_y)) + random.randint(0, 1)
+        goal = self.tile_mapping[goal_x][goal_y]
+        step = 1
+        while is_goal_not_found:
+            if goal.owner is None:
+                is_goal_not_found = False
+            else:
+                if n % 2 == 0:
+                    goal_x += step
+                    if goal_x > board_size[0]:
+                        goal_x -= 2
+                        step = -1
+                if n % 2 == 1:
+                    goal_y += 1
+                    if goal_y > board_size[1]:
+                        goal_y -= 2
+                        step = -1
+            goal = self.tile_mapping[goal_x][goal_y]
+            n += 1
+        goal.type = 'goal'
+        self.goal = goal

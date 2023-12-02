@@ -19,17 +19,22 @@ class GameModel:
 
     def start(self, vs_ia, language):
         self.language = language
-        self.set_players(vs_ia)
+        initial_tiles = self.set_players(vs_ia)
         self.turn = random.randint(1, len(self.players))
+        self.board.set_goal_tile(initial_tiles)
 
     def set_players(self, vs_ia):
         self.add_player(Player('1'))
         self.add_player(Player('2'))
 
+        initial_tiles = []
+
         for player in self.players:
             player_init_tile = self.board.calc_init_player_tile()
             player.start(cash=self.game_parameters['initial_cash'])
             self.board.set_tile_to_a_player(player_init_tile, player)
+            initial_tiles.append(player_init_tile)
+        return initial_tiles
 
     @staticmethod
     def get_game_parameters():
