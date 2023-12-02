@@ -11,6 +11,7 @@ class BoardModel(Board):
         self.tile_mapping = []
         self.wood_squares = self._calc_wood_squares()
         self.create_board()
+        self.goal = None
 
     @staticmethod
     def _calc_wood_squares():
@@ -72,5 +73,5 @@ class BoardModel(Board):
                         step = -1
             goal = self.tile_mapping[goal_x][goal_y]
             n += 1
-        goal.type = 'goal'
+        goal.type = '3'
         self.goal = goal
