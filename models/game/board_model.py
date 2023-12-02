@@ -14,6 +14,10 @@ class BoardModel(Board):
 
     @staticmethod
     def _calc_wood_squares():
+        """
+        To ensure a more homogeneous wood tile distribution
+        :return:
+        """
         wood_squares = []
         for i in range(n_divisions):
             wood_squares += random.sample(range(int(board_size[0] * board_size[1] / n_divisions * i + 1),
