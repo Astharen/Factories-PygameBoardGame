@@ -2,7 +2,7 @@ import sys
 
 import pygame
 
-from Scripts.general_use import draw_text_centered, create_buttons
+from helper.extra_pygame_functions import draw_text_centered, create_buttons
 from abstract_classes.view import View
 from data.constants import button_text_all_lang, color_mapping, font, button_function, coord_buttons
 
