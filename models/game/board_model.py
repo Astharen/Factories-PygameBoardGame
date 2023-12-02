@@ -10,7 +10,7 @@ class BoardModel(Board):
     def __init__(self):
         self.tile_mapping = []
         self.wood_squares = self._calc_wood_squares()
-        self.init_player_pos = self._calc_init_player_pos()
+        self.create_board()
 
     @staticmethod
     def _calc_wood_squares():
@@ -27,8 +27,7 @@ class BoardModel(Board):
         else:
             return TileModel(x, y, "0")
 
-    @staticmethod
-    def _calc_init_player_pos():
+    def calc_init_player_tile(self):
         first_x = random.randint(0, board_size[0] - 1)
         first_y = random.randint(0, board_size[1] - 1)
-        return first_x, first_y
+        return self.tile_mapping[first_x][first_y]

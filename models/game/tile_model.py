@@ -4,4 +4,3 @@ class TileModel:
         self.x = x
         self.y = y
         self.type = tile_type
-        self.owner = None

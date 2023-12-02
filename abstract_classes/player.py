@@ -1,15 +1,15 @@
 class Player:
     def __init__(self, name):
         self.name = name
-        self.position = (0, 0)  # Initial position
-        self.score = 0
+        self.owned_tiles = []
+        self.wood = None
+        self.factory = None
+        self.cash = None
+        self.current_profit = None
 
-    def move(self, new_position):
-        # Update the player's position based on the new position
-        self.position = new_position
-
-    def increase_score(self, points):
-        # Increment the player's score by the specified points
-        self.score += points
-
-    # Additional methods, properties, and behaviors specific to a player
+    def start(self, initial_tile, cash):
+        self.owned_tiles.append(initial_tile)
+        self.cash = cash
+        self.wood = 0
+        self.factory = 0
+        self.current_profit = 0
