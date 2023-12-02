@@ -28,4 +28,4 @@ coord_buttons = [(100, 120, 300, 80), (100, 250, 300, 80)]
 
 button_function = ["main_loop(True,", "main_loop(False,"]
 
-button_text = {'English': ["vs AI", "2 players"], 'Spanish': ["vs IA", "2 jugadores"]}
+button_text_all_lang = {'English': ["vs AI", "2 players"], 'Spanish': ["vs IA", "2 jugadores"]}
