@@ -15,3 +15,6 @@ class Player:
 
     def add_tile(self, tile):
         self.owned_tiles.append(tile)
+
+    def calc_num_owned_tile_type(self, tile_type):
+        return sum([1 if tile.type == tile_type else 0 for tile in self.owned_tiles])

@@ -23,7 +23,7 @@ class MainMenuView(View):
 
     def main(self):
         while True:
-            self.screen.fill(color_mapping['background_main_menu_color'])
+            self.screen.fill(color_mapping['background_main_menu'])
             draw_text_centered('Main menu', font, (0, 0, 0), self.screen, 250, 50)
             click = False
             mx, my = pygame.mouse.get_pos()
@@ -39,18 +39,18 @@ class MainMenuView(View):
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         click = True
-            n_button, main_buttons_click = create_buttons(coord_buttons, color_mapping['button_color'],
+            n_button, main_buttons_click = create_buttons(coord_buttons, color_mapping['button'],
                                                           self.button_text, click, mx, my, self.screen, font)
 
             if main_buttons_click:
-                is_ia = n_button == 0
-                self.presenter.change_to_game(is_ia)
+                vs_ai = n_button == 0
+                self.presenter.change_to_game(vs_ai)
 
             font_lang = pygame.font.SysFont(None, 30)
 
             language_button = pygame.Rect((280, 420, 200, 60))
 
-            pygame.draw.rect(self.screen, color_mapping['button_color'], language_button)
+            pygame.draw.rect(self.screen, color_mapping['button'], language_button)
 
             if click:
                 if language_button.collidepoint((mx, my)):

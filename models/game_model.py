@@ -15,17 +15,20 @@ class GameModel:
         self.ended_game = False
         self.language = None
         self.turn = None
+        self.first_turn = None
         self.taxes = int((0 + 2) * 1/2)
+        self.n_turns = 1
 
-    def start(self, vs_ia, language):
+    def start(self, vs_ai, language):
         self.language = language
-        initial_tiles = self.set_players(vs_ia)
-        self.turn = random.randint(1, len(self.players))
+        initial_tiles = self.set_players(vs_ai)
+        self.first_turn = random.randint(1, len(self.players))
+        self.turn = self.first_turn
         self.board.set_goal_tile(initial_tiles)
 
-    def set_players(self, vs_ia):
-        self.add_player(Player('1'))
-        self.add_player(Player('2'))
+    def set_players(self, vs_ai):
+        self.add_player(Player('player1'))
+        self.add_player(Player('player2'))
 
         initial_tiles = []
 
@@ -38,10 +41,40 @@ class GameModel:
 
     @staticmethod
     def get_game_parameters():
-        with open('../data/game_parameters.txt', 'r') as outfile:
+        with open('data/game_parameters.txt', 'r') as outfile:
             game_parameters = json.load(outfile)
 
         return game_parameters
 
     def add_player(self, player):
         self.players.append(player)
+
+    def get_current_player(self):
+        return self.players[self.turn - 1]
+
+    def calc_player_tile_exploration(self, tile_x, tile_y):
+        tile = self.board.tile_mapping[tile_x][tile_y]
+        player = self.get_current_player()
+        player.cash -= self.game_parameters['exploration_price']
+        self.board.set_tile_to_a_player(tile, player)
+
+    def calc_player_factory_buy(self, tile_x, tile_y):
+        tile = self.board.tile_mapping[tile_x][tile_y]
+        player = self.get_current_player()
+        tile.type = 'factory'
+        player.cash -= self.game_parameters['factory_price']
+        self.board.set_tile_to_a_player(tile, player)
+
+    def end_turn(self):
+        player = self.get_current_player()
+        wood_profit, factory_profit = self.game_parameters['wood_profit'], self.game_parameters['factory_profit']
+        n_wood = player.calc_num_owned_tile_type('wood')
+        n_factories = player.calc_num_owned_tile_type('wood')
+        player.current_profit = wood_profit * n_wood + factory_profit * n_factories
+        player.cash += player.current_profit
+        if self.n_turns % len(self.players) == 0:
+            for p in self.players:
+                p.cash -= self.taxes
+            self.taxes = int((self.n_turns + 2) * 1 / 2)
+        self.turn = (self.n_turns + self.first_turn + 1) % 2 + 1
+        self.n_turns += 1

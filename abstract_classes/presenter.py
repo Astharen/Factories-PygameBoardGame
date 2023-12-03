@@ -10,3 +10,4 @@ class Presenter:
     def set_view(self, view):
         self.view = view
         self.view.set_presenter(self)
+        view.start()

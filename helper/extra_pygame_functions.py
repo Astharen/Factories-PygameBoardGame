@@ -2,19 +2,19 @@ import pygame
 import sys
 
 
-def surrounded_property(x, y, turn, list_property, board_size):
+def surrounded_property(x, y, turn, list_tile_models, board_size):
     direction = [0, 0]
     sided_square = False
     for y_sur in range(y - 1, y + 2):
         y_sur = min(y_sur, board_size[0] - 1)
         y_sur = max(y_sur, 0)
-        if list_property[y_sur][x] == str(turn) and y_sur != y:
+        if list_tile_models[x][y_sur].owner == f'player{turn}' and y_sur != y:
             sided_square = True
             direction = [0, int((y - y_sur) / abs(y - y_sur))]
     for x_sur in range(x - 1, x + 2):
         x_sur = min(x_sur, board_size[0] - 1)
         x_sur = max(x_sur, 0)
-        if list_property[y][x_sur] == str(turn) and x_sur != x:
+        if list_tile_models[x_sur][y].owner == f'player{turn}' and x_sur != x:
             sided_square = True
             direction = [int((x - x_sur) / abs(x - x_sur)), 0]
     return sided_square, direction

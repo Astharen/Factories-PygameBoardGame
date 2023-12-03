@@ -4,10 +4,6 @@ from data.constants import button_text_all_lang
 
 class MainMenuPresenter(Presenter):
 
-    def set_view(self, view):
-        super().set_view(view)
-        view.start()
-
     def set_next_language(self):
         languages = list(button_text_all_lang.keys())
         index = languages.index(self.get_language())
@@ -21,5 +17,5 @@ class MainMenuPresenter(Presenter):
     def get_language(self):
         return self.model.language
 
-    def change_to_game(self, is_ia):
-        self.app.set_window('game', is_ia=is_ia, language=self.get_language())
+    def change_to_game(self, vs_ai):
+        self.app.set_window('game', vs_ai=vs_ai, language=self.get_language())

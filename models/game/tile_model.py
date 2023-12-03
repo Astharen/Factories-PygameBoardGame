@@ -4,7 +4,7 @@ class TileModel:
         self.x = x
         self.y = y
         self.type = tile_type
-        self.owner = None
+        self.owner = 'black'
 
     def set_owner(self, player):
-        self.owner = player
+        self.owner = player.name

@@ -28,9 +28,9 @@ class BoardModel(Board):
 
     def _get_position_tile(self, x, y):
         if (board_size[0] * y + x + 1) in self.wood_squares:
-            return TileModel(x, y, '1')
+            return TileModel(x, y, 'wood')
         else:
-            return TileModel(x, y, '0')
+            return TileModel(x, y, 'nothing')
 
     @staticmethod
     def set_tile_to_a_player(tile, player):
@@ -44,7 +44,7 @@ class BoardModel(Board):
             first_x = random.randint(0, board_size[0] - 1)
             first_y = random.randint(0, board_size[1] - 1)
             first_tile = self.tile_mapping[first_x][first_y]
-            if first_tile.type == '0' and first_tile.owner is None:
+            if first_tile.type == 'nothing' and first_tile.owner == 'black':
                 not_end = False
         return first_tile
 
@@ -53,25 +53,25 @@ class BoardModel(Board):
         is_goal_not_found = True
         first_x = [player_init_tile.x for player_init_tile in players_initial_tiles]
         first_y = [player_init_tile.y for player_init_tile in players_initial_tiles]
-        goal_x = int(sum(first_x) / len(first_x)) + random.randint(0, 1)
-        goal_y = int(sum(first_y) / len(first_y)) + random.randint(0, 1)
+        goal_x = max(board_size[0] - 1, int(sum(first_x) / len(first_x)) + random.randint(0, 1))
+        goal_y = max(board_size[1] - 1, int(sum(first_y) / len(first_y)) + random.randint(0, 1))
         goal = self.tile_mapping[goal_x][goal_y]
         step = 1
         while is_goal_not_found:
-            if goal.owner is None:
+            if goal.owner == 'black':
                 is_goal_not_found = False
             else:
                 if n % 2 == 0:
                     goal_x += step
-                    if goal_x > board_size[0]:
+                    if goal_x >= board_size[0]:
                         goal_x -= 2
                         step = -1
                 if n % 2 == 1:
                     goal_y += 1
-                    if goal_y > board_size[1]:
+                    if goal_y >= board_size[1]:
                         goal_y -= 2
                         step = -1
             goal = self.tile_mapping[goal_x][goal_y]
             n += 1
-        goal.type = '3'
+        goal.type = 'goal'
         self.goal = goal
