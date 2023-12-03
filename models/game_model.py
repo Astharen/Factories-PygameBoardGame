@@ -69,7 +69,7 @@ class GameModel:
         player = self.get_current_player()
         wood_profit, factory_profit = self.game_parameters['wood_profit'], self.game_parameters['factory_profit']
         n_wood = player.calc_num_owned_tile_type('wood')
-        n_factories = player.calc_num_owned_tile_type('wood')
+        n_factories = player.calc_num_owned_tile_type('factory')
         player.current_profit = wood_profit * n_wood + factory_profit * n_factories
         player.cash += player.current_profit
         if self.n_turns % len(self.players) == 0:
