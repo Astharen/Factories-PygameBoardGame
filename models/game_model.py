@@ -1,7 +1,7 @@
 import json
 import random
 
-from abstract_classes.player import Player
+from models.game.player import Player
 from models.game.board_model import BoardModel
 
 
