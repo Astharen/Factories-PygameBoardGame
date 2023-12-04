@@ -3,7 +3,7 @@ import sys
 import pygame
 
 from abstract_classes.view import View
-from data.constants import board_size, square_size, color_mapping, window_x, window_y
+from data.constants import board_size, square_size, window_x, window_y, legend_color_text_mapping
 from helper.extra_pygame_functions import draw_text_top_left, draw_text_centered, surrounded_property, conf_menu
 from views.game.board_view import BoardView
 
@@ -120,45 +120,23 @@ class GameView(View):
                 pygame.draw.rect(self.screen, tile_view.fill_color, tile_view.rect)
                 pygame.draw.rect(self.screen, tile_view.border_color, tile_view.rect, 3)
 
-    def draw_leyend(self):
+    def draw_legend(self):
         left_x = int((square_size + 3) * board_size[0] + 30)
         font_conf = pygame.font.SysFont(None, 20)
         y = self.board.left_top_y + 30
-        spanish_text = ['Madera', 'Fábrica', 'Jugador 1', 'Jugador 2', 'Meta']
-        english_text = ['Wood', 'Factory', 'Player 1', 'Player 2', 'Goal']
-        index = 0
 
         language = self.presenter.get_language()
-        wood_color = color_mapping['wood']
-        factory_color = color_mapping['factory']
-        color_player1 = color_mapping['player1']
-        color_player2 = color_mapping['player2']
-        goal_color = color_mapping['goal']
 
-        if language == 'English':
-            text_list = english_text
-        elif language == 'Spanish':
-            text_list = spanish_text
-
-        # Resources
-        draw_text_top_left(text_list[index], font_conf, (255, 255, 255), self.screen, left_x + 35, y)
-        pygame.draw.rect(self.screen, wood_color, (left_x, y, 20, 20))
-        y += 35
-        index += 1
-        draw_text_top_left(text_list[index], font_conf, (255, 255, 255),self.screen, left_x + 35, y)
-        pygame.draw.rect(self.screen, factory_color, (left_x, y, 20, 20))
-        y += 35
-        index += 1
-        draw_text_top_left(text_list[index], font_conf, (255, 255, 255),self.screen, left_x + 35, y)
-        pygame.draw.rect(self.screen, color_player1, (left_x, y, 20, 20), 2)
-        y += 35
-        index += 1
-        draw_text_top_left(text_list[index], font_conf, (255, 255, 255),self.screen, left_x + 35, y)
-        pygame.draw.rect(self.screen, color_player2, (left_x, y, 20, 20), 2)
-        y += 35
-        index += 1
-        draw_text_top_left(text_list[index], font_conf, (255, 255, 255),self.screen, left_x + 35, y)
-        pygame.draw.rect(self.screen, goal_color, (left_x, y, 20, 20), 2)
+        for index in range(len(legend_color_text_mapping['color'])):
+            text = legend_color_text_mapping['language'][language][index]
+            color = legend_color_text_mapping['color'][index]
+            border = legend_color_text_mapping['border'][index]
+            draw_text_top_left(text, font_conf, (255, 255, 255), self.screen, left_x + 35, y)
+            if border:
+                pygame.draw.rect(self.screen, color, (left_x, y, 20, 20), border)
+            else:
+                pygame.draw.rect(self.screen, color, (left_x, y, 20, 20))
+            y += 35
 
     def draw_top_side(self):
 
