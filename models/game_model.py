@@ -63,7 +63,6 @@ class GameModel:
         player = self.get_current_player()
         tile.type = 'factory'
         player.cash -= self.game_parameters['factory_price']
-        self.board.set_tile_to_a_player(tile, player)
 
     def end_turn(self):
         player = self.get_current_player()
