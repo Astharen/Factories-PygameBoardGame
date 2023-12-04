@@ -29,3 +29,13 @@ legend_color_text_mapping = {'language': {'English': ['Wood', 'Factory', 'Goal',
                              'color': [color_mapping['wood'], color_mapping['factory'], color_mapping['goal'],
                                        color_mapping['player1'], color_mapping['player2']],
                              'border': [None, None, None, 2, 2]}
+
+top_side_mapping_table = {'language': {'English': ['1', 'Wood', 'Factory', 'Money', 'Profit'],
+                                       'Spanish': ['1', 'Madera', 'Fábrica', 'Dinero', 'Beneficios']},
+                          'attribute': ['name', 'wood', 'factory', 'cash', 'current_profit']}
+
+top_side_mapping_right = {'language': {'English': ['Turn: %s(turn)', '%s(player_name)\'s turn', 'Taxes: %s(taxes)'],
+                                       'Spanish': ['Turno: %s(turn)', 'Turno de: %s(player_name)',
+                                                   'Impuestos: %s(taxes)']},
+                          'var_names': ['turn', 'player_name', 'taxes']}
+

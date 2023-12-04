@@ -3,7 +3,8 @@ import sys
 import pygame
 
 from abstract_classes.view import View
-from data.constants import board_size, square_size, window_x, window_y, legend_color_text_mapping
+from data.constants import board_size, square_size, window_x, window_y, legend_color_text_mapping, \
+    top_side_mapping_table, top_side_mapping_right
 from helper.extra_pygame_functions import draw_text_top_left, draw_text_centered, surrounded_property, conf_menu
 from views.game.board_view import BoardView
 
@@ -28,7 +29,7 @@ class GameView(View):
             # goal_enclosed = calculate_goal_enclosed(goal, board_size, list_property)
             self.draw_map()
             self.draw_top_side()
-            self.draw_leyend()
+            self.draw_legend()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.run = False
@@ -94,10 +95,12 @@ class GameView(View):
                             if sided_square:
                                 goal_price = game_parameters['goal_price']
                                 if language == 'Spanish':
-                                    confirm, conf_pass = conf_menu(self.screen, mx, my, 'Meta: ' + str(goal_price), window_x,
+                                    confirm, conf_pass = conf_menu(self.screen, mx, my, 'Meta: ' + str(goal_price),
+                                                                   window_x,
                                                                    window_y, language)
                                 elif language == 'English':
-                                    confirm, conf_pass = conf_menu(self.screen, mx, my, 'Goal: ' + str(goal_price), window_x,
+                                    confirm, conf_pass = conf_menu(self.screen, mx, my, 'Goal: ' + str(goal_price),
+                                                                   window_x,
                                                                    window_y, language)
 
                                 n_player_factories = player.calc_num_owned_tile_type('factory')
@@ -146,92 +149,41 @@ class GameView(View):
         taxes = self.presenter.get_taxes()
         language = self.presenter.get_language()
         players = self.presenter.get_players()
-
-        wood, factory, cash, current_profit = {}, {}, {}, {}
-        for idx, player in enumerate(players):
-            wood[str(idx + 1)] = player.calc_num_owned_tile_type('wood')
-            factory[str(idx + 1)] = player.calc_num_owned_tile_type('factory')
-            cash[str(idx + 1)] = player.cash
-            current_profit[str(idx + 1)] = player.current_profit
+        [player.calc_wood_and_factory() for player in players]
 
         font_conf = pygame.font.SysFont(None, 20)
-        x_table = int(window_x/3*2)
-        y_table = left_top_y - int(left_top_y/10) - 20
-        y_table = int(y_table - (y_table%3))
-        heigth_part = int(y_table/3)
-        spanish_text = ['Madera', 'Fábrica', 'Dinero', 'Beneficios', 'Turno: ', 'Turno de: ' + str(turn), 'Impuestos: ']
-        english_text = ['Wood', 'Factory', 'Money', 'Profit', 'Turn: ', str(turn) + '\'s turn', 'Taxes: ']
-        index = 0
-        if language == 'Spanish':
-            text_list = spanish_text
-            x_total_parts = 3 + 8 + 9 + 8 + 11# This has been calculated by counting the number of letter in each word and adding 2 (1 for each space)
-            # The words were: one number, madera, fábrica, dinero, beneficio
-            x_player = int(x_table * 3 / x_total_parts)
-            x_wood = int(x_table * 8 / x_total_parts)
-            x_factory = int(x_table * 9 / x_total_parts)
-            x_cash = int(x_table * 8 / x_total_parts)
-            x_profit = int(x_table * 11 / x_total_parts)
-            x_table = int(x_player + x_wood + x_factory + x_cash + x_profit)
-            pygame.draw.rect(self.screen, (200, 200, 200), (20, 20,  x_table, y_table))
-        elif language == 'English':
-            text_list = english_text
-            x_total_parts = 3 + 6 + 9 + 7 + 8
-            # This has been calculated by counting the number of letter in each word and adding 2 (1 for each space)
-            # The words were: one number, wood, factory, money, profit
-            x_player = int(x_table * 3 / x_total_parts)
-            x_wood = int(x_table * 6 / x_total_parts)
-            x_factory = int(x_table * 9 / x_total_parts)
-            x_cash = int(x_table * 7 / x_total_parts)
-            x_profit = int(x_table * 8 / x_total_parts)
-            x_table = int(x_player + x_wood + x_factory + x_cash + x_profit)
-            pygame.draw.rect(self.screen, (200, 200, 200), (20, 20,  x_table, y_table))
+        x_table = int(window_x / 3 * 2)
+        y_table = left_top_y - int(left_top_y / 10) - 20
+        y_table = int(y_table - (y_table % 3))
+        height_part = int(y_table / (1 + len(players)))
+
+        text_list = top_side_mapping_table['language'][language]
+        x_measurements = [len(text) + 2 for text in text_list]
+        x_measurements = [int(x_table * x_meas / sum(x_measurements)) for x_meas in x_measurements]
+        x_table = sum(x_measurements)
+        pygame.draw.rect(self.screen, (200, 200, 200), (20, 20, x_table, y_table))
+
         x = 20
-        # Player
-        pygame.draw.rect(self.screen, (0, 0, 0), (x, 20, x_player, heigth_part), 2)
-        pygame.draw.rect(self.screen, (0, 0, 0), (x, 20 + heigth_part, x_player, heigth_part), 2)
-        draw_text_centered('1', font_conf, (0, 0, 0), self.screen, x + x_player/2, 20 + heigth_part + heigth_part/2)
-        pygame.draw.rect(self.screen, (0, 0, 0), (x, 20 + 2*heigth_part, x_player, heigth_part), 2)
-        draw_text_centered('2', font_conf, (0, 0, 0), self.screen, x + x_player/2, 20 + 2*heigth_part + heigth_part/2)
-        x += x_player
-        # Wood
-        pygame.draw.rect(self.screen, (0, 0, 0), (x, 20, x_wood, heigth_part), 2)
-        draw_text_centered(text_list[index], font_conf, (0, 0, 0), self.screen, x + x_wood/2, 20 + heigth_part/2)
-        pygame.draw.rect(self.screen, (0, 0, 0), (x, 20 + heigth_part, x_wood, heigth_part), 2)
-        draw_text_centered(str(wood['1']), font_conf, (0, 0, 0), self.screen, x + x_wood/2, 20 + heigth_part + heigth_part/2)
-        pygame.draw.rect(self.screen, (0, 0, 0), (x, 20 + 2*heigth_part, x_wood, heigth_part), 2)
-        draw_text_centered(str(wood['2']), font_conf, (0, 0, 0), self.screen, x + x_wood/2, 20 + 2*heigth_part + heigth_part/2)
-        x += x_wood
-        index += 1
-        # F actory
-        pygame.draw.rect(self.screen, (0, 0, 0), (x, 20, x_factory, heigth_part), 2)
-        draw_text_centered(text_list[index], font_conf, (0, 0, 0), self.screen, x + x_factory/2, 20 + heigth_part/2)
-        pygame.draw.rect(self.screen, (0, 0, 0), (x, 20 + heigth_part, x_factory, heigth_part), 2)
-        draw_text_centered(str(factory['1']), font_conf, (0, 0, 0), self.screen, x + x_factory/2, 20 + heigth_part + heigth_part/2)
-        pygame.draw.rect(self.screen, (0, 0, 0), (x, 20 + 2*heigth_part, x_factory, heigth_part), 2)
-        draw_text_centered(str(factory['2']), font_conf, (0, 0, 0), self.screen, x + x_factory/2, 20 + 2*heigth_part + heigth_part/2)
-        x += x_factory
-        index += 1
-        # Cash
-        pygame.draw.rect(self.screen, (0, 0, 0), (x, 20, x_cash, heigth_part), 2)
-        draw_text_centered(text_list[index], font_conf, (0, 0, 0), self.screen, x + x_cash/2, 20 + heigth_part/2)
-        pygame.draw.rect(self.screen, (0, 0, 0), (x, 20 + heigth_part, x_cash, heigth_part), 2)
-        draw_text_centered(str(cash['1']), font_conf, (0, 0, 0), self.screen, x + x_cash/2, 20 + heigth_part + heigth_part/2)
-        pygame.draw.rect(self.screen, (0, 0, 0), (x, 20 + 2*heigth_part, x_cash, heigth_part), 2)
-        draw_text_centered(str(cash['2']), font_conf, (0, 0, 0), self.screen, x + x_cash/2, 20 + 2*heigth_part + heigth_part/2)
-        x += x_cash
-        index += 1
-        # Profit
-        pygame.draw.rect(self.screen, (0, 0, 0), (x, 20, x_profit, heigth_part), 2)
-        draw_text_centered(text_list[index], font_conf, (0, 0, 0), self.screen, x + x_profit/2, 20 + heigth_part/2)
-        pygame.draw.rect(self.screen, (0, 0, 0), (x, 20 + heigth_part, x_profit, heigth_part), 2)
-        draw_text_centered(str(current_profit['1']), font_conf, (0, 0, 0), self.screen, x + x_profit/2, 20 + heigth_part + heigth_part/2)
-        pygame.draw.rect(self.screen, (0, 0, 0), (x, 20 + 2*heigth_part, x_profit, heigth_part), 2)
-        draw_text_centered(str(current_profit['2']), font_conf, (0, 0, 0), self.screen, x + x_profit/2, 20 + 2*heigth_part + heigth_part/2)
-        index += 1
-        # Turns
+        for index in range(len(top_side_mapping_table['language']['English'])):
+            x_section = x_measurements[index]
+            pygame.draw.rect(self.screen, (0, 0, 0), (x, 20, x_section, height_part), 2)
+            draw_text_centered(text_list[index], font_conf, (0, 0, 0), self.screen,
+                               x + x_section / 2, 20 + height_part / 2)
+            for idx, player in enumerate(players):
+                attribute = top_side_mapping_table['attribute'][index]
+                text = str(index) if index == 0 else str(getattr(player, attribute))
+
+                pygame.draw.rect(self.screen, (0, 0, 0), (x, 20 + (idx + 1) * height_part, x_section, height_part), 2)
+                draw_text_centered(text, font_conf, (0, 0, 0), self.screen, x + x_section / 2,
+                                   20 + (idx + 1) * height_part + height_part / 2)
+            x += x_section
+
         x_turn = x_table + 20 + 50
-        draw_text_centered(text_list[index] + str(n_turns), font_conf, (255, 255, 255), self.screen, x_turn, 20)
-        index += 1
-        draw_text_centered(text_list[index], font_conf, (255, 255, 255), self.screen, x_turn, 60)
-        index += 1
-        draw_text_centered(text_list[index] + str(taxes), font_conf, (255, 255, 255), self.screen, x_turn, 100)
+        y = 20
+        var_values = {'turn': str(n_turns), 'player_name': str(turn + 1), 'taxes': str(taxes)}
+        for right_index in range(len(top_side_mapping_right['var_names'])):
+            text = top_side_mapping_right['language'][language][right_index]
+            var_name = top_side_mapping_right['var_names'][right_index]
+            text = text.replace(f'%s({var_name})', var_values[var_name])
+            draw_text_centered(text, font_conf, (255, 255, 255), self.screen, x_turn, y)
+            y += 40
