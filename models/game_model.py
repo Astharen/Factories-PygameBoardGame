@@ -18,7 +18,6 @@ class GameModel:
         self.language = None
         self.turn = None
         self.first_turn = None
-        self.taxes = int((0 + 2) * 1/2)
         self.n_turns = 1
         self.taxes = self.calc_taxes_by_turn()
 
