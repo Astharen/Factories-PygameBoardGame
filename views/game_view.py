@@ -59,7 +59,24 @@ class GameView(View):
                     tile_model = self.presenter.get_tile_from_position(x, y)
                     tile_view = self.board.tile_mapping[x][y]
                     if tile_view.rect.collidepoint((mx, my)) and click:
-                        if tile_model.owner == 'black':
+                        if tile_model.type == 'goal':
+                            sided_square, direction = surrounded_property(x, y, turn, list_tile_models, board_size)
+                            if sided_square:
+                                goal_price = game_parameters['goal_price']
+                                if language == 'Spanish':
+                                    confirm, conf_pass = conf_menu(self.screen, mx, my, 'Meta: ' + str(goal_price),
+                                                                   window_x,
+                                                                   window_y, language)
+                                elif language == 'English':
+                                    confirm, conf_pass = conf_menu(self.screen, mx, my, 'Goal: ' + str(goal_price),
+                                                                   window_x,
+                                                                   window_y, language)
+
+                                n_player_factories = player.calc_num_owned_tile_type('factory')
+                                if confirm and player.cash >= goal_price and n_player_factories > 4:
+                                    sb_end = True
+                                    action += 1
+                        elif tile_model.owner == 'black':
                             sided_square, direction = surrounded_property(x, y, turn, list_tile_models, board_size)
                             if sided_square:
                                 # self.screenshot = pygame.display.get_surface()
@@ -90,23 +107,6 @@ class GameView(View):
                                 self.presenter.calc_player_factory_buy(x, y)
                             if conf_pass:
                                 action += 1
-                        elif tile_model.type == 'goal':
-                            sided_square, direction = surrounded_property(x, y, turn, list_tile_models, board_size)
-                            if sided_square:
-                                goal_price = game_parameters['goal_price']
-                                if language == 'Spanish':
-                                    confirm, conf_pass = conf_menu(self.screen, mx, my, 'Meta: ' + str(goal_price),
-                                                                   window_x,
-                                                                   window_y, language)
-                                elif language == 'English':
-                                    confirm, conf_pass = conf_menu(self.screen, mx, my, 'Goal: ' + str(goal_price),
-                                                                   window_x,
-                                                                   window_y, language)
-
-                                n_player_factories = player.calc_num_owned_tile_type('factory')
-                                if confirm and player.cash >= goal_price and n_player_factories > 4:
-                                    sb_end = True
-                                    action += 1
             if action == 1:
                 if sb_end:
                     self.run = False
