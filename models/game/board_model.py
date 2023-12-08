@@ -53,8 +53,8 @@ class BoardModel(Board):
         is_goal_not_found = True
         first_x = [player_init_tile.x for player_init_tile in players_initial_tiles]
         first_y = [player_init_tile.y for player_init_tile in players_initial_tiles]
-        goal_x = max(board_size[0] - 1, int(sum(first_x) / len(first_x)) + random.randint(0, 1))
-        goal_y = max(board_size[1] - 1, int(sum(first_y) / len(first_y)) + random.randint(0, 1))
+        goal_x = min(board_size[0] - 1, int(sum(first_x) / len(first_x)) + random.randint(0, 1))
+        goal_y = min(board_size[1] - 1, int(sum(first_y) / len(first_y)) + random.randint(0, 1))
         goal = self.tile_mapping[goal_x][goal_y]
         step = 1
         while is_goal_not_found:
