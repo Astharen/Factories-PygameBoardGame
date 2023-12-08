@@ -43,9 +43,11 @@ class GamePresenter(Presenter):
     def end_turn(self):
         self.model.end_turn()
         players = self.model.players
+        players_to_drop = []
         for player in players:
             if player.cash < 0:
-                self.model.drop_player(player)
+                players_to_drop.append(player)
+        self.model.drop_player_list(players_to_drop)
         if len(players) <= 1:
             winner = players if len(players) > 0 else None
             self.change_to_end(winner=winner)

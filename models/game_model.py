@@ -84,6 +84,7 @@ class GameModel:
         self.turn = (self.n_turns + self.first_turn + 1) % 2 + 1
         self.n_turns += 1
 
-    def drop_player(self, player):
-        self.dropped_players.append(player)
-        self.players.remove(player)
+    def drop_player_list(self, players_to_drop):
+        for player in players_to_drop:
+            self.dropped_players.append(player)
+            self.players.remove(player)
