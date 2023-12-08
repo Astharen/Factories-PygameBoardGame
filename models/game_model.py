@@ -14,6 +14,7 @@ class GameModel:
         self.game_parameters = self.get_game_parameters()
 
         self.ended_game = False
+        self.vs_ai = None
         self.language = None
         self.turn = None
         self.first_turn = None
@@ -22,6 +23,7 @@ class GameModel:
 
     def start(self, vs_ai, language):
         self.language = language
+        self.vs_ai = vs_ai
         initial_tiles = self.set_players(vs_ai)
         self.first_turn = random.randint(1, len(self.players))
         self.turn = self.first_turn
