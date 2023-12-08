@@ -20,6 +20,7 @@ class GameModel:
         self.first_turn = None
         self.taxes = int((0 + 2) * 1/2)
         self.n_turns = 1
+        self.taxes = self.calc_taxes_by_turn()
 
     def start(self, vs_ai, language):
         self.language = language
@@ -67,6 +68,9 @@ class GameModel:
         tile.type = 'factory'
         player.cash -= self.game_parameters['factory_price']
 
+    def calc_taxes_by_turn(self):
+        return int((self.n_turns + 2) * 1 / 2)
+
     def end_turn(self):
         player = self.get_current_player()
         wood_profit, factory_profit = self.game_parameters['wood_profit'], self.game_parameters['factory_profit']
@@ -77,7 +81,7 @@ class GameModel:
         if self.n_turns % len(self.players) == 0:
             for p in self.players:
                 p.cash -= self.taxes
-            self.taxes = int((self.n_turns + 2) * 1 / 2)
+            self.taxes = self.calc_taxes_by_turn()
         self.turn = (self.n_turns + self.first_turn + 1) % 2 + 1
         self.n_turns += 1
 
