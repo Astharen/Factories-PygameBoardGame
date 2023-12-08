@@ -19,8 +19,7 @@ class EndView(View):
 
         self.screen.blit(label, (window_x / 2 - label.get_width() / 2, window_y / 2 - label.get_height() / 2))
         pygame.display.update()
-
-    pygame.time.delay(2000)
+        pygame.time.delay(2000)
 
     def main(self):
         language = self.presenter.get_language()
