@@ -1,6 +1,3 @@
-from models.game.player import Player
-
-
 class EndModel:
     def __init__(self):
         self.language = None
@@ -13,9 +10,16 @@ class EndModel:
         self.vs_ai = vs_ai
 
     def choose_ending_text(self):
-        if self.language == 'Spanish':
-            name = self.winner.name.replace('player', '')
-            text = f'El jugador {name} gana!'
-        elif self.language == 'English':
-            name = self.winner.name.replace('player', '')
-            text = f'Player {name} won!'
+        if self.winner is None:
+            if self.language == 'Spanish':
+                text = 'Todos han perdido.'
+            elif self.language == 'English':
+                text = 'Everybody have lost.'
+        else:
+            if self.language == 'Spanish':
+                name = self.winner.name.replace('player', '')
+                text = f'El jugador {name} gana!'
+            elif self.language == 'English':
+                name = self.winner.name.replace('player', '')
+                text = f'Player {name} won!'
+        return text
