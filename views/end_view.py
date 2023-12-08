@@ -32,7 +32,7 @@ class EndView(View):
         run = True
         while run:
             self.screen.fill((0, 0, 0))
-            label = self.font.render(text, 1, (255,255,255))
+            label = self.font.render(text, 1, (255, 255, 255))
             self.screen.blit(label, (window_x / 2 - label.get_width() / 2, window_y / 2 - label.get_height() / 2))
             pygame.display.update()
             for event in pygame.event.get():
