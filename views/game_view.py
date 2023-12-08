@@ -110,8 +110,7 @@ class GameView(View):
             if action == 1:
                 if sb_end:
                     self.run = False
-                    winner = True
-                    self.presenter.change_to_end_screen(winner)
+                    self.presenter.change_to_end(winner=player)
                 else:
                     self.presenter.end_turn()
             pygame.display.update()

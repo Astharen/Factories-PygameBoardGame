@@ -42,9 +42,13 @@ class GamePresenter(Presenter):
 
     def end_turn(self):
         self.model.end_turn()
-        for player in self.model.players:
+        players = self.model.players
+        for player in players:
             if player.cash < 0:
-                self.change_to_end_screen(winner=False)
+                self.model.drop_player(player)
+        if len(players) <= 1:
+            winner = players if len(players) > 0 else None
+            self.change_to_end(winner=winner)
 
-    def change_to_end_screen(self, winner):
-        pass
+    def change_to_end(self, winner):
+        self.app.set_window('end', language=self.get_language(), winner=winner, vs_ai=self.model.vs_ai)

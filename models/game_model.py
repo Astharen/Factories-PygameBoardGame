@@ -8,6 +8,7 @@ from models.game.board_model import BoardModel
 class GameModel:
     def __init__(self):
         self.players = []
+        self.dropped_players = []
         self.board = BoardModel()
 
         self.game_parameters = self.get_game_parameters()
@@ -77,3 +78,7 @@ class GameModel:
             self.taxes = int((self.n_turns + 2) * 1 / 2)
         self.turn = (self.n_turns + self.first_turn + 1) % 2 + 1
         self.n_turns += 1
+
+    def drop_player(self, player):
+        self.dropped_players.append(player)
+        self.players.remove(player)
