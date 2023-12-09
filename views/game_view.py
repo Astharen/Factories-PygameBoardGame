@@ -60,7 +60,7 @@ class GameView(View):
                     tile_view = self.board.tile_mapping[x][y]
                     if tile_view.rect.collidepoint((mx, my)) and click:
                         if tile_model.type == 'goal':
-                            sided_square, direction = surrounded_property(x, y, turn, list_tile_models, board_size)
+                            sided_square, direction = surrounded_property(x, y, turn, list_tile_models)
                             if sided_square:
                                 goal_price = game_parameters['goal_price']
                                 if language == 'Spanish':
@@ -77,7 +77,7 @@ class GameView(View):
                                     sb_end = True
                                     action += 1
                         elif tile_model.owner == 'black':
-                            sided_square, direction = surrounded_property(x, y, turn, list_tile_models, board_size)
+                            sided_square, direction = surrounded_property(x, y, turn, list_tile_models)
                             if sided_square:
                                 # self.screenshot = pygame.display.get_surface()
                                 if language == 'Spanish':

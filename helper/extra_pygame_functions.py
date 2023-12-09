@@ -1,8 +1,10 @@
 import pygame
 import sys
 
+from data.constants import board_size
 
-def surrounded_property(x, y, turn, list_tile_models, board_size):
+
+def surrounded_property(x, y, turn, list_tile_models):
     direction = [0, 0]
     sided_square = False
     for y_sur in range(y - 1, y + 2):
