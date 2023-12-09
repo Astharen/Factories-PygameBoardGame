@@ -6,6 +6,7 @@ from abstract_classes.view import View
 from data.constants import board_size, square_size, window_x, window_y, legend_color_text_mapping, \
     top_side_mapping_table, top_side_mapping_right
 from helper.extra_pygame_functions import draw_text_top_left, draw_text_centered, surrounded_property, conf_menu
+from models.game.ai import AI
 from views.game.board_view import BoardView
 
 
@@ -23,10 +24,8 @@ class GameView(View):
         while self.run:
             self.screen.fill((50, 50, 50))
             self.clock.tick(30)
-            action = 0
             click = False
-            sb_end = False
-            # goal_enclosed = calculate_goal_enclosed(goal, board_size, list_property)
+
             self.draw_map()
             self.draw_top_side()
             self.draw_legend()
@@ -37,83 +36,90 @@ class GameView(View):
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        run = False
+                        self.run = False
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         click = True
-            # if ia:
-            #     list_property, action, current_profit, wood, factory, list_color_map, sb_end, goal_enclosed = movement_IA(
-            #         possible_squares, list_property, list_color_map,
-            #         board_size, turn, cash, goal_price, n_turns, current_profit, factory_price, exploration_price, goal,
-            #         wood_profit, factory_profit, factory, wood, goal_enclosed)
 
-            turn = self.presenter.get_turn()
-            list_tile_models = self.presenter.get_tile_mapping()
-            language = self.presenter.get_language()
-            game_parameters = self.presenter.get_game_parameters()
             player = self.presenter.get_current_player()
+            if not isinstance(player, AI):
+                action, sb_end = self.turn_player(click)
+            else:
+                action, sb_end = self.turn_player(click)
 
-            mx, my = pygame.mouse.get_pos()
-            for x in range(board_size[0]):
-                for y in range(board_size[1]):
-                    tile_model = self.presenter.get_tile_from_position(x, y)
-                    tile_view = self.board.tile_mapping[x][y]
-                    if tile_view.rect.collidepoint((mx, my)) and click:
-                        if tile_model.type == 'goal':
-                            sided_square, direction = surrounded_property(x, y, turn, list_tile_models)
-                            if sided_square:
-                                goal_price = game_parameters['goal_price']
-                                if language == 'Spanish':
-                                    confirm, conf_pass = conf_menu(self.screen, mx, my, 'Meta: ' + str(goal_price),
-                                                                   window_x,
-                                                                   window_y, language)
-                                elif language == 'English':
-                                    confirm, conf_pass = conf_menu(self.screen, mx, my, 'Goal: ' + str(goal_price),
-                                                                   window_x,
-                                                                   window_y, language)
-
-                                n_player_factories = player.calc_num_owned_tile_type('factory')
-                                if confirm and player.cash >= goal_price and n_player_factories > 4:
-                                    sb_end = True
-                                    action += 1
-                        elif tile_model.owner == 'black':
-                            sided_square, direction = surrounded_property(x, y, turn, list_tile_models)
-                            if sided_square:
-                                # self.screenshot = pygame.display.get_surface()
-                                if language == 'Spanish':
-                                    confirm, conf_pass = conf_menu(self.screen, mx, my,
-                                                                   f'Explorar: {game_parameters["exploration_price"]}',
-                                                                   window_x, window_y, language)
-                                elif language == 'English':
-                                    confirm, conf_pass = conf_menu(self.screen, mx, my,
-                                                                   f'Explore: {game_parameters["exploration_price"]}',
-                                                                   window_x, window_y, language)
-                                if confirm and player.cash >= game_parameters["exploration_price"]:
-                                    action += 1
-                                    self.presenter.calc_player_tile_exploration(x, y)
-                                if conf_pass:
-                                    action += 1
-                        elif f'player{turn}' == tile_model.owner and tile_model.type != 'factory':
-                            # self.screenshot = pygame.display.get_surface()
-                            factory_price = game_parameters['factory_price']
-                            if language == 'Spanish':
-                                confirm, conf_pass = conf_menu(self.screen, mx, my, 'Fábrica: ' + str(factory_price),
-                                                               window_x, window_y, language)
-                            elif language == 'English':
-                                confirm, conf_pass = conf_menu(self.screen, mx, my, 'Factory: ' + str(factory_price),
-                                                               window_x, window_y, language)
-                            if confirm and player.cash >= factory_price:
-                                action += 1
-                                self.presenter.calc_player_factory_buy(x, y)
-                            if conf_pass:
-                                action += 1
             if action == 1:
                 if sb_end:
                     self.run = False
+                    player = self.presenter.get_current_player()
                     self.presenter.change_to_end(winner=player)
                 else:
                     self.presenter.end_turn()
             pygame.display.update()
+
+    def turn_player(self, click):
+        turn = self.presenter.get_turn()
+        list_tile_models = self.presenter.get_tile_mapping()
+        language = self.presenter.get_language()
+        game_parameters = self.presenter.get_game_parameters()
+        player = self.presenter.get_current_player()
+
+        mx, my = pygame.mouse.get_pos()
+        sb_end = False
+        action = 0
+        for x in range(board_size[0]):
+            for y in range(board_size[1]):
+                tile_model = self.presenter.get_tile_from_position(x, y)
+                tile_view = self.board.tile_mapping[x][y]
+                if tile_view.rect.collidepoint((mx, my)) and click:
+                    if tile_model.type == 'goal':
+                        sided_square, direction = surrounded_property(x, y, turn, list_tile_models)
+                        if sided_square:
+                            goal_price = game_parameters['goal_price']
+                            if language == 'Spanish':
+                                confirm, conf_pass = conf_menu(self.screen, mx, my, 'Meta: ' + str(goal_price),
+                                                               window_x,
+                                                               window_y, language)
+                            elif language == 'English':
+                                confirm, conf_pass = conf_menu(self.screen, mx, my, 'Goal: ' + str(goal_price),
+                                                               window_x,
+                                                               window_y, language)
+
+                            n_player_factories = player.calc_num_owned_tile_type('factory')
+                            if confirm and player.cash >= goal_price and n_player_factories > 4:
+                                sb_end = True
+                                action = 1
+                    elif tile_model.owner == 'black':
+                        sided_square, direction = surrounded_property(x, y, turn, list_tile_models)
+                        if sided_square:
+                            # self.screenshot = pygame.display.get_surface()
+                            if language == 'Spanish':
+                                confirm, conf_pass = conf_menu(self.screen, mx, my,
+                                                               f'Explorar: {game_parameters["exploration_price"]}',
+                                                               window_x, window_y, language)
+                            elif language == 'English':
+                                confirm, conf_pass = conf_menu(self.screen, mx, my,
+                                                               f'Explore: {game_parameters["exploration_price"]}',
+                                                               window_x, window_y, language)
+                            if confirm and player.cash >= game_parameters["exploration_price"]:
+                                action = 1
+                                self.presenter.calc_player_tile_exploration(x, y)
+                            if conf_pass:
+                                action = 1
+                    elif f'player{turn}' == tile_model.owner and tile_model.type != 'factory':
+                        # self.screenshot = pygame.display.get_surface()
+                        factory_price = game_parameters['factory_price']
+                        if language == 'Spanish':
+                            confirm, conf_pass = conf_menu(self.screen, mx, my, 'Fábrica: ' + str(factory_price),
+                                                           window_x, window_y, language)
+                        elif language == 'English':
+                            confirm, conf_pass = conf_menu(self.screen, mx, my, 'Factory: ' + str(factory_price),
+                                                           window_x, window_y, language)
+                        if confirm and player.cash >= factory_price:
+                            action = 1
+                            self.presenter.calc_player_factory_buy(x, y)
+                        if conf_pass:
+                            action = 1
+        return action, sb_end
 
     def draw_map(self):
         for y in range(board_size[1]):
