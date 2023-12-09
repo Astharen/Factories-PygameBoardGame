@@ -171,16 +171,16 @@ class AI(Player):
 
         return list_property, action, current_profit, wood, factory, list_color_map, sb_end, goal_enclosed
 
-    def exploring(self, list_property, list_color_map, board_size, turn, wood, current_profit, cash, wood_profit,
-                  exploration_price):
+    def _exploring(self, list_property, list_color_map, turn, wood, current_profit, cash, wood_profit,
+                   exploration_price):
         wood_list = []
-        possible_squares, direction = self.get_possible_square(list_property, list_color_map, board_size, turn)
+        possible_squares, direction = self._get_possible_square(list_property, list_color_map, turn)
         ind = 0
         if len(possible_squares['1']) > 0:
             for possibilities in possible_squares['1']:
                 wood_list.append(
-                    self.region_with_more_wood(possibilities[0], possibilities[1], direction['1'][ind], board_size,
-                                               list_color_map, list_property))
+                    self._calc_region_with_more_wood(possibilities[0], possibilities[1], direction['1'][ind],
+                                                     list_color_map, list_property))
                 ind += 1
             max_wood = max(wood_list)
             index = wood_list.index(max_wood)
@@ -191,8 +191,8 @@ class AI(Player):
         else:  # If there's no possible wood square
             for possibilities in possible_squares['0']:
                 wood_list.append(
-                    self.region_with_more_wood(possibilities[0], possibilities[1], direction['0'][ind], board_size,
-                                               list_color_map, list_property))
+                    self._calc_region_with_more_wood(possibilities[0], possibilities[1], direction['0'][ind],
+                                                     list_color_map, list_property))
                 ind += 1
             max_wood = max(wood_list)
             index = wood_list.index(max_wood)
@@ -200,8 +200,8 @@ class AI(Player):
             cash[str(turn)] -= exploration_price
         return list_property, list_color_map, wood, cash, current_profit
 
-    def buying_a_factory(self, board_size, turn, list_color_map, factory, factory_price, cash, current_profit,
-                         factory_profit, list_property, wood):
+    def _buying_a_factory(self, turn, list_color_map, factory, factory_price, cash, current_profit,
+                          factory_profit, list_property, wood):
         bought_factory = False
         for y_prop in range(board_size[1]):
             for x_prop in range(board_size[0]):
@@ -225,19 +225,19 @@ class AI(Player):
                         wood[str(turn)] -= 1
         return list_property, list_color_map, cash, current_profit, factory, wood, bought_factory
 
-    def get_possible_square(self, list_property, list_color_map, board_size, turn):
+    def _get_possible_square(self, list_property, list_color_map, turn):
         possible_squares = {'0': [], '1': []}
         directions = {'0': [], '1': []}
         for y in range(board_size[1]):
             for x in range(board_size[0]):
                 if list_property[y][x] == '0':
-                    sided_square, direction = surrounded_property(x, y, turn, list_property, board_size)
+                    sided_square, direction = surrounded_property(x, y, turn, list_property)
                     if sided_square:
                         possible_squares[list_color_map[y][x]].append([x, y])
                         directions[list_color_map[y][x]].append(direction)
         return possible_squares, directions
 
-    def region_with_more_wood(self, x, y, direction, board_size, list_color_map, list_property):
+    def _calc_region_with_more_wood(self, x, y, direction, list_color_map, list_property):
 
         wood = 0
         y_dir1 = y + direction[1] - 1
@@ -272,7 +272,7 @@ class AI(Player):
                     wood += 1
         return wood
 
-    def calculate_goal_enclosed(self, goal, board_size, list_property):
+    def _calculate_goal_enclosed(self, goal, list_property):
         goal_enclosed = False
         prop1 = 0
         prop2 = 0
@@ -281,17 +281,17 @@ class AI(Player):
         x1 = max(goal[0] - 1, 0)
         x2 = min(goal[0] + 1, board_size[0] - 1)
         for iy in range(y1, y2):
-            sided_square1, direction1 = surrounded_property(goal[0], iy, 1, list_property, board_size)
+            sided_square1, direction1 = surrounded_property(goal[0], iy, 1, list_property)
             if sided_square1:
                 prop1 += 1
-            sided_square2, direction2 = surrounded_property(goal[0], iy, 2, list_property, board_size)
+            sided_square2, direction2 = surrounded_property(goal[0], iy, 2, list_property)
             if sided_square2:
                 prop2 += 1
         for ix in range(x1, x2):
-            sided_square1, direction1 = surrounded_property(ix, goal[1], 1, list_property, board_size)
+            sided_square1, direction1 = surrounded_property(ix, goal[1], 1, list_property)
             if sided_square1:
                 prop1 += 1
-            sided_square2, direction2 = surrounded_property(ix, goal[1], 2, list_property, board_size)
+            sided_square2, direction2 = surrounded_property(ix, goal[1], 2, list_property)
             if sided_square2:
                 prop2 += 1
         if prop1 == 4 or prop2 == 4:
