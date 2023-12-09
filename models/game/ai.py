@@ -60,11 +60,9 @@ class AI(Player):
                                                                                recursive_map, list_possible_tiles)
         return recursive_map, list_possible_tiles
 
-    def bfs_shortest_path(self, graph, start, goal):
-
+    def _bfs_shortest_path(self, graph, start, goal):
         explored = []
         queue = [[start]]
-        bought = False
 
         while queue:
             path = queue.pop(0)
@@ -76,47 +74,30 @@ class AI(Player):
                     new_path.append(neighbour)
                     queue.append(new_path)
                     if neighbour == goal:
-                        bought = True
-                        return new_path, bought
+                        return new_path
 
                 explored.append(node)
-        return [], bought
+        return []
 
-    def buying_nearest_tile(self, position_tile, list_property, exploration_price, turn, current_profit, wood,
-                            list_color_map, cash, wood_profit):
-        list_property[position_tile[1]][position_tile[0]] = str(turn)
-        cash[str(turn)] -= exploration_price
-        if list_color_map[position_tile[1]][position_tile[0]] == '1':
-            wood[str(turn)] += 1
-            current_profit[str(turn)] += wood_profit
-
-        return list_property, current_profit, wood, cash
-
-    def looking_for_shortest_path(self, recursed_map, list_possible_tiles, goal, list_color_map):
-        ind = 0
-        final_ind = 0
+    def _looking_for_shortest_path(self, recursive_map, list_possible_tiles, goal):
         min_path = 0
-        final_bought = False
-        for tile in list_possible_tiles:
-            start = str(goal[0]) + str(goal[1])
-            finish_tile = tile
-            new_path, bought = self.bfs_shortest_path(recursed_map, start, finish_tile)
-            len_path = len(new_path)
-            if len_path < min_path:
-                min_path = len_path
-                final_ind = ind
-            elif len_path == min_path:
-                if list_color_map[int(tile[1])][int(tile[0])] == '1':
-                    min_path = len_path
-                    final_ind = ind
-            ind += 1
-            if bought:
-                final_bought = True
-        return [int(list_possible_tiles[final_ind][0]), int(list_possible_tiles[final_ind][1])], final_bought
+        tile_bought = None
 
-    def movement_IA(self, list_property, list_color_map, board_size, turn, cash, goal_price, n_turns,
-                    current_profit, factory_price, exploration_price, goal, wood_profit, factory_profit, factory, wood,
-                    goal_enclosed):
+        for idx, tile in enumerate(list_possible_tiles):
+            new_path = self._bfs_shortest_path(recursive_map, start=goal, goal=tile)
+            len_path = len(new_path)
+            if len_path == 0:
+                tile_bought = None
+            elif len_path < min_path:
+                tile_bought = tile
+            elif len_path == min_path and tile.type == 'wood':
+                tile_bought = tile
+
+        return tile_bought
+
+    def movement(self, list_property, list_color_map, turn, cash, goal_price, n_turns,
+                 current_profit, factory_price, exploration_price, goal, wood_profit, factory_profit, factory, wood,
+                 goal_enclosed):
         action = 0
         sb_end = False
         if turn == 2:
