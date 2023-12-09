@@ -4,57 +4,59 @@ from models.game.player import Player
 
 class AI(Player):
 
-    def creating_goal_graph(self, goal, list_property, board_size, turn, recursed_map, list_possible_tiles):
-        y = goal[1]
+    def __init__(self, name):
+        super().__init__(name)
+
+    def _creating_goal_graph(self, goal, tile_mapping, turn, recursive_map, list_possible_tiles):
         x = goal[0]
+        y = goal[1]
         main_key = str(x) + str(y)
-        recursed_map[main_key] = []
+        recursive_map[main_key] = []
         for y_sur in range(y - 1, y + 2):
             y_sur = min(y_sur, board_size[1] - 1)
             y_sur = max(y_sur, 0)
-            side_squared, _ = surrounded_property(x, y_sur, turn, list_property, board_size)
-            key = str(x) + str(y_sur)
-
-            if key not in recursed_map.keys():
-                recursed_map[key] = []
-            if main_key != key and key not in recursed_map[main_key]:
-                recursed_map[main_key].append(key)
-            if side_squared and list_property[y_sur][x] == '0' and key not in list_possible_tiles:
-                list_possible_tiles.append(key)
-
-            if y_sur == 0 or y_sur == board_size[1] - 1:
+            result = self._step_of_creating_goal_graph(x, y_sur, turn, tile_mapping, recursive_map, main_key,
+                                                       list_possible_tiles, goal, is_x=False)
+            if result is None:
                 break
-            if not side_squared or list_property[y_sur][x] != '0':
-                new_square = [x, y_sur]
-                if new_square != goal and main_key not in recursed_map[key]:
-                    recursed_map, list_possible_tiles = self.creating_goal_graph(new_square, list_property, board_size,
-                                                                                 turn,
-                                                                                 recursed_map, list_possible_tiles)
+            else:
+                recursive_map, list_possible_tiles = result
 
         for x_sur in range(x - 1, x + 2):
             x_sur = min(x_sur, board_size[0] - 1)
             x_sur = max(x_sur, 0)
-            side_squared, _ = surrounded_property(x_sur, y, turn, list_property, board_size)
-            key = str(x_sur) + str(y)
-
-            if key not in recursed_map.keys():
-                recursed_map[key] = []
-            if main_key != key and key not in recursed_map[main_key]:
-                recursed_map[main_key].append(key)
-
-            if side_squared and list_property[y][x_sur] == '0' and key not in list_possible_tiles:
-                list_possible_tiles.append(key)
-
-            if x_sur == 0 or x_sur == board_size[0] - 1:
+            result = self._step_of_creating_goal_graph(x_sur, y, turn, tile_mapping, recursive_map, main_key,
+                                                       list_possible_tiles, goal, is_x=True)
+            if result is None:
                 break
-            if not side_squared or list_property[y][x_sur] != '0':
-                new_square = [x_sur, y]
-                if new_square != goal and main_key not in recursed_map[key]:
-                    recursed_map, list_possible_tiles = self.creating_goal_graph(new_square, list_property, board_size,
-                                                                                 turn,
-                                                                                 recursed_map, list_possible_tiles)
+            else:
+                recursive_map, list_possible_tiles = result
 
-        return recursed_map, list_possible_tiles
+        return recursive_map, list_possible_tiles
+
+    def _step_of_creating_goal_graph(self, x, y, turn, tile_mapping, recursive_map, main_key, list_possible_tiles, goal,
+                                     is_x):
+        side_squared, _ = surrounded_property(x, y, turn, tile_mapping)
+        key = str(x) + str(y)
+
+        if key not in recursive_map.keys():
+            recursive_map[key] = []
+        if main_key != key and key not in recursive_map[main_key]:
+            recursive_map[main_key].append(key)
+        if side_squared and tile_mapping[x][y].owner == 'black' and key not in list_possible_tiles:
+            list_possible_tiles.append(key)
+
+        if not is_x and (y == 0 or y == board_size[1] - 1):
+            return None
+        elif is_x and (x == 0 or x == board_size[0] - 1):
+            return None
+
+        if not side_squared or tile_mapping[x][y].owner != 'black':
+            new_square = [x, y]
+            if new_square != goal and main_key not in recursive_map[key]:
+                recursive_map, list_possible_tiles = self._creating_goal_graph(new_square, tile_mapping, turn,
+                                                                               recursive_map, list_possible_tiles)
+        return recursive_map, list_possible_tiles
 
     def bfs_shortest_path(self, graph, start, goal):
 
