@@ -1,3 +1,4 @@
+from data.constants import board_size
 from helper.extra_pygame_functions import surrounded_property
 from models.game.player import Player
 
