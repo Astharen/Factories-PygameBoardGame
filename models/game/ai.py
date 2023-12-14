@@ -206,7 +206,7 @@ class AI(Player):
         directions = {'nothing': [], 'wood': []}
         for x in range(board_size[0]):
             for y in range(board_size[1]):
-                if tile_mapping_model[x][y].owner == 'black':
+                if tile_mapping_model[x][y].owner == 'black' and tile_mapping_model[x][y].type != 'goal':
                     turn = self.presenter.get_turn()
                     sided_square, direction = surrounded_property(x, y, turn, tile_mapping_model)
                     if sided_square:
