@@ -13,8 +13,8 @@ class AI(Player):
         self.presenter = presenter
 
     def _creating_goal_graph(self, goal, tile_mapping, turn, recursive_map, list_possible_tiles):
-        x = goal[0]
-        y = goal[1]
+        x = goal.x
+        y = goal.y
         main_key = (x, y)
         recursive_map[main_key] = []
         for y_sur in range(y - 1, y + 2):
@@ -57,7 +57,7 @@ class AI(Player):
             return None
 
         if not side_squared or tile_mapping[x][y].owner != 'black':
-            new_square = [x, y]
+            new_square = tile_mapping[x][y]
             if new_square != goal and main_key not in recursive_map[key]:
                 recursive_map, list_possible_tiles = self._creating_goal_graph(new_square, tile_mapping, turn,
                                                                                recursive_map, list_possible_tiles)
