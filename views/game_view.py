@@ -45,7 +45,7 @@ class GameView(View):
             if not isinstance(player, AI):
                 action, sb_end = self.turn_player(click)
             else:
-                action, sb_end = self.turn_player(click)
+                action, sb_end = player.movement()
 
             if action == 1:
                 if sb_end:
