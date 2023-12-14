@@ -97,81 +97,67 @@ class AI(Player):
 
         return tile_bought
 
-    def movement(self, list_property, list_color_map, turn, cash, goal_price, n_turns,
-                 current_profit, factory_price, exploration_price, goal, wood_profit, factory_profit, factory, wood,
-                 goal_enclosed):
+    def movement(self):
         action = 0
         sb_end = False
-        if turn == 2:
-            jturn = n_turns
-            jprofit = current_profit[str(turn)]
-            minimum_price = goal_price + jturn / 2
-            for iturn in range(int(5 - factory[str(turn)] + 1)):
-                minimum_price += jturn / 2 - jprofit + factory_price
-                jturn += 2
-                jprofit += factory_profit - int(wood_profit / 5)
+        tiles_mapping_model = self.presenter.get_tile_mapping()
+        goal = self.presenter.get_goal()
+        goal_enclosed = self._calculate_goal_enclosed(goal, tiles_mapping_model)
+        game_parameters = self.presenter.get_game_parameters()
 
-            minimum_price += jturn / 2
+        factory_price = game_parameters['factory_price']
+        factory_profit = game_parameters['factory_profit']
+        wood_profit = game_parameters['wood_profit']
+        goal_price = game_parameters['goal_price']
 
-            sided_square, direction = surrounded_property(goal[0], goal[1], turn, list_property, board_size)
-            if not sided_square and current_profit[str(turn)] > 20:
-                if not goal_enclosed:
-                    bought = False
-                    recursed_map, list_possible_tiles = self.creating_goal_graph(goal, list_property, board_size, turn,
-                                                                                 recursed_map={},
-                                                                                 list_possible_tiles=[])
-                    position_tile, bought = self.looking_for_shortest_path(recursed_map, list_possible_tiles, goal,
-                                                                           list_color_map)
-                    list_property, current_profit, wood, cash = self.buying_nearest_tile(position_tile, list_property,
-                                                                                         board_size, exploration_price,
-                                                                                         turn,
-                                                                                         current_profit, wood,
-                                                                                         list_color_map, cash,
-                                                                                         wood_profit)
+        n_turns = self.presenter.get_n_turns()
+        jturn = n_turns
+        jprofit = self.current_profit
+        minimum_price = goal_price + jturn / 2
+        self.calc_wood_and_factory()
+        for iturn in range(int(5 - self.factory + 1)):
+            minimum_price += jturn / 2 - jprofit + factory_price
+            jturn += 2
+            jprofit += factory_profit - int(wood_profit / 5)
 
-                    if not bought:
-                        goal_enclosed = True
-                    else:
-                        action = 1
-            elif cash[str(turn)] > minimum_price:
-                action = 1
-                sided_square, direction = surrounded_property(goal[0], goal[1], turn, list_property, board_size)
-                if factory[str(turn)] > 4 and not goal_enclosed:
-                    if sided_square:
-                        if cash[str(turn)] >= goal_price and cash[str(turn)] > minimum_price:
-                            sb_end = True
-                            cash[str(turn)] -= goal_price
-                        else:
-                            return list_property, action, current_profit, wood, factory, list_color_map, sb_end
+        minimum_price += jturn / 2
+
+        turn = self.presenter.get_turn()
+        sided_square, direction = surrounded_property(goal[0], goal[1], turn, tiles_mapping_model)
+        if not sided_square and self.current_profit > 20:
+            if not goal_enclosed:
+                recursive_map, list_possible_tiles = self._creating_goal_graph(goal, tiles_mapping_model, turn,
+                                                                               recursive_map={},
+                                                                               list_possible_tiles=[])
+                position_tile = self._looking_for_shortest_path(recursive_map, list_possible_tiles, goal)
+                self.presenter.calc_player_tile_exploration(*position_tile)
+
+                if position_tile is None:
+                    goal_enclosed = True
                 else:
-                    list_property, list_color_map, cash, current_profit, factory, wood, bought_factory = self.buying_a_factory(
-                        board_size, turn, list_color_map, factory,
-                        factory_price, cash, current_profit, factory_profit, list_property, wood)
-
-            elif cash[str(turn)] > factory_price and current_profit[str(turn)] > (n_turns / 2) and factory[
-                str(turn)] < 5:
-                action = 1
-                list_property, list_color_map, cash, current_profit, factory, wood, bought_factory = self.buying_a_factory(
-                    board_size, turn, list_color_map, factory,
-                    factory_price, cash, current_profit, factory_profit, list_property, wood)
-                if not bought_factory:
                     action = 1
-                    list_property, list_color_map, wood, cash, current_profit = self.exploring(list_property,
-                                                                                               list_color_map,
-                                                                                               board_size, turn, wood,
-                                                                                               current_profit, cash,
-                                                                                               wood_profit,
-                                                                                               exploration_price)
+        elif self.cash > minimum_price:
+            sided_square, direction = surrounded_property(goal[0], goal[1], turn, tiles_mapping_model)
+            if self.factory > 4 and not goal_enclosed:
+                if sided_square:
+                    if self.cash >= goal_price and self.cash > minimum_price:
+                        sb_end = True
+                        action = 1
+                        return action, sb_end
+                    else:
+                        return action, sb_end
             else:
-                action = 1
-                list_property, list_color_map, wood, cash, current_profit = self.exploring(list_property,
-                                                                                           list_color_map,
-                                                                                           board_size, turn, wood,
-                                                                                           current_profit, cash,
-                                                                                           wood_profit,
-                                                                                           exploration_price)
+                action = self._buying_a_factory()
 
-        return list_property, action, current_profit, wood, factory, list_color_map, sb_end, goal_enclosed
+        elif (self.cash > factory_price and self.current_profit > (n_turns / 2)
+              and self.factory < 5):
+            action = self._buying_a_factory()
+            if action == 0:
+                action = self._exploring()
+        else:
+            action = self._exploring()
+
+        return action, sb_end
 
     def _exploring(self, list_property, list_color_map, turn, wood, current_profit, cash, wood_profit,
                    exploration_price):
