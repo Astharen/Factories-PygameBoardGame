@@ -12,7 +12,7 @@ class AI(Player):
     def _creating_goal_graph(self, goal, tile_mapping, turn, recursive_map, list_possible_tiles):
         x = goal[0]
         y = goal[1]
-        main_key = str(x) + str(y)
+        main_key = (x, y)
         recursive_map[main_key] = []
         for y_sur in range(y - 1, y + 2):
             y_sur = min(y_sur, board_size[1] - 1)
@@ -39,14 +39,14 @@ class AI(Player):
     def _step_of_creating_goal_graph(self, x, y, turn, tile_mapping, recursive_map, main_key, list_possible_tiles, goal,
                                      is_x):
         side_squared, _ = surrounded_property(x, y, turn, tile_mapping)
-        key = str(x) + str(y)
+        key = (x, y)
 
         if key not in recursive_map.keys():
             recursive_map[key] = []
         if main_key != key and key not in recursive_map[main_key]:
             recursive_map[main_key].append(key)
         if side_squared and tile_mapping[x][y].owner == 'black' and key not in list_possible_tiles:
-            list_possible_tiles.append(key)
+            list_possible_tiles.append(tile_mapping[x][y])
 
         if not is_x and (y == 0 or y == board_size[1] - 1):
             return None
@@ -131,11 +131,8 @@ class AI(Player):
                                                                                list_possible_tiles=[])
                 position_tile = self._looking_for_shortest_path(recursive_map, list_possible_tiles, goal)
                 self.presenter.calc_player_tile_exploration(*position_tile)
-
-                if position_tile is None:
-                    goal_enclosed = True
-                else:
-                    action = 1
+                action = 1
+                return action, sb_end
         elif self.cash > minimum_price:
             sided_square, direction = surrounded_property(goal[0], goal[1], turn, tiles_mapping_model)
             if self.factory > 4 and not goal_enclosed:
@@ -157,36 +154,37 @@ class AI(Player):
         else:
             action = self._exploring()
 
+        if action == 0:
+            action = 1
         return action, sb_end
 
-    def _exploring(self, list_property, list_color_map, turn, wood, current_profit, cash, wood_profit,
-                   exploration_price):
+    def _exploring(self):
+        if self.cash < self.presenter.get_game_parameters()['exploration_price']:
+            return 0
+        action = 0
         wood_list = []
-        possible_squares, direction = self._get_possible_square(list_property, list_color_map, turn)
-        ind = 0
-        if len(possible_squares['1']) > 0:
-            for possibilities in possible_squares['1']:
-                wood_list.append(
-                    self._calc_region_with_more_wood(possibilities[0], possibilities[1], direction['1'][ind],
-                                                     list_color_map, list_property))
-                ind += 1
+        possible_squares, direction = self._get_possible_square()
+        for ind, possibilities in enumerate(possible_squares['wood']):
+            wood_list.append(
+                self._calc_region_with_more_wood(possibilities[0], possibilities[1], direction['wood'][ind]))
+
+        if len(wood_list):
             max_wood = max(wood_list)
             index = wood_list.index(max_wood)
-            list_property[possible_squares['1'][index][1]][possible_squares['1'][index][0]] = str(turn)
-            wood[str(turn)] += 1
-            current_profit[str(turn)] += wood_profit
-            cash[str(turn)] -= exploration_price
-        else:  # If there's no possible wood square
-            for possibilities in possible_squares['0']:
-                wood_list.append(
-                    self._calc_region_with_more_wood(possibilities[0], possibilities[1], direction['0'][ind],
-                                                     list_color_map, list_property))
-                ind += 1
+            action = 1
+            self.presenter.calc_player_tile_exploration(*possible_squares['wood'][index])
+            return action
+
+        for ind, possibilities in enumerate(possible_squares['nothing']):
+            wood_list.append(
+                self._calc_region_with_more_wood(possibilities[0], possibilities[1], direction['nothing'][ind]))
+
+        if len(wood_list):
             max_wood = max(wood_list)
             index = wood_list.index(max_wood)
-            list_property[possible_squares['0'][index][1]][possible_squares['0'][index][0]] = str(turn)
-            cash[str(turn)] -= exploration_price
-        return list_property, list_color_map, wood, cash, current_profit
+            action = 1
+            self.presenter.calc_player_tile_exploration(*possible_squares['nothing'][index])
+        return action
 
     def _buying_a_factory(self):
         if len(self.owned_tiles) == 0 or self.cash < self.presenter.get_game_parameters['factory_price']:
@@ -202,7 +200,7 @@ class AI(Player):
     def _get_possible_square(self):
         tile_mapping_model = self.presenter.get_tile_mapping()
         possible_squares = {'nothing': [], 'wood': []}
-        directions = {'0': [], '1': []}
+        directions = {'nothing': [], 'wood': []}
         for x in range(board_size[0]):
             for y in range(board_size[1]):
                 if tile_mapping_model[x][y].owner == 'nothing':
@@ -213,7 +211,7 @@ class AI(Player):
                         directions[tile_mapping_model[x][y].type].append(direction)
         return possible_squares, directions
 
-    def _calc_region_with_more_wood(self, x, y, direction, list_color_map, list_property):
+    def _calc_region_with_more_wood(self, x, y, direction):
 
         wood = 0
         y_dir1 = y + direction[1] - 1
@@ -242,9 +240,11 @@ class AI(Player):
             x_dir1 += supp_x
             x_dir2 += supp_x
 
+        tile_mapping = self.presenter.get_tile_mapping()
+
         for y_reg in range(min(y_dir1, y_dir2), (max(y_dir1, y_dir2) + 1)):
             for x_reg in range(min(x_dir1, x_dir2), (max(x_dir1, x_dir2) + 1)):
-                if list_color_map[y_reg][x_reg] == '1' and list_property[y_reg][x_reg] == '0':
+                if tile_mapping[x_reg][y_reg].type == 'wood' and tile_mapping[x_reg][y_reg].owner == 'black':
                     wood += 1
         return wood
 
