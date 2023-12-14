@@ -126,7 +126,7 @@ class AI(Player):
         minimum_price += jturn / 2
 
         turn = self.presenter.get_turn()
-        sided_square, direction = surrounded_property(goal[0], goal[1], turn, tiles_mapping_model)
+        sided_square, direction = surrounded_property(goal.x, goal.y, turn, tiles_mapping_model)
         if not sided_square and self.current_profit > 20:
             if not goal_enclosed:
                 recursive_map, list_possible_tiles = self._creating_goal_graph(goal, tiles_mapping_model, turn,
@@ -137,7 +137,7 @@ class AI(Player):
                 action = 1
                 return action, sb_end
         elif self.cash > minimum_price:
-            sided_square, direction = surrounded_property(goal[0], goal[1], turn, tiles_mapping_model)
+            sided_square, direction = surrounded_property(goal.x, goal.y, turn, tiles_mapping_model)
             if self.factory > 4 and not goal_enclosed:
                 if sided_square:
                     if self.cash >= goal_price and self.cash > minimum_price:
@@ -190,7 +190,7 @@ class AI(Player):
         return action
 
     def _buying_a_factory(self):
-        if len(self.owned_tiles) == 0 or self.cash < self.presenter.get_game_parameters['factory_price']:
+        if len(self.owned_tiles) == 0 or self.cash < self.presenter.get_game_parameters()['factory_price']:
             return 0
         tile_to_buy = self.owned_tiles[0]
         for tile in self.owned_tiles:
@@ -256,21 +256,21 @@ class AI(Player):
         goal_enclosed = False
         prop1 = 0
         prop2 = 0
-        x1, y1 = max(goal[0] - 1, 0), max(goal[1] - 1, 0)
-        x2, y2 = min(goal[0] + 1, board_size[0] - 1), min(goal[1] + 1, board_size[1] - 1)
+        x1, y1 = max(goal.x - 1, 0), max(goal.y - 1, 0)
+        x2, y2 = min(goal.x + 1, board_size[0] - 1), min(goal.y + 1, board_size[1] - 1)
 
         for iy in range(y1, y2):
-            sided_square1, direction1 = surrounded_property(goal[0], iy, 1, tile_mapping)
+            sided_square1, direction1 = surrounded_property(goal.x, iy, 1, tile_mapping)
             if sided_square1:
                 prop1 += 1
-            sided_square2, direction2 = surrounded_property(goal[0], iy, 2, tile_mapping)
+            sided_square2, direction2 = surrounded_property(goal.x, iy, 2, tile_mapping)
             if sided_square2:
                 prop2 += 1
         for ix in range(x1, x2):
-            sided_square1, direction1 = surrounded_property(ix, goal[1], 1, tile_mapping)
+            sided_square1, direction1 = surrounded_property(ix, goal.y, 1, tile_mapping)
             if sided_square1:
                 prop1 += 1
-            sided_square2, direction2 = surrounded_property(ix, goal[1], 2, tile_mapping)
+            sided_square2, direction2 = surrounded_property(ix, goal.y, 2, tile_mapping)
             if sided_square2:
                 prop2 += 1
         if prop1 == 4 or prop2 == 4:
