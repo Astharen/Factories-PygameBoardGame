@@ -60,7 +60,8 @@ class AI(Player):
                                                                                recursive_map, list_possible_tiles)
         return recursive_map, list_possible_tiles
 
-    def _bfs_shortest_path(self, graph, start, goal):
+    @staticmethod
+    def _bfs_shortest_path(graph, start, goal):
         explored = []
         queue = [[start]]
 
@@ -79,12 +80,13 @@ class AI(Player):
                 explored.append(node)
         return []
 
-    def _looking_for_shortest_path(self, recursive_map, list_possible_tiles, goal):
+    @staticmethod
+    def _looking_for_shortest_path(recursive_map, list_possible_tiles, goal):
         min_path = 0
         tile_bought = None
 
         for idx, tile in enumerate(list_possible_tiles):
-            new_path = self._bfs_shortest_path(recursive_map, start=goal, goal=tile)
+            new_path = AI._bfs_shortest_path(recursive_map, start=goal, goal=tile)
             len_path = len(new_path)
             if len_path == 0:
                 tile_bought = None
