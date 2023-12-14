@@ -125,32 +125,27 @@ class AI(Player):
 
         minimum_price += jturn / 2
 
-        turn = self.presenter.get_turn()
+        turn = int(self.name.replace('player', ''))
         sided_square, direction = surrounded_property(goal.x, goal.y, turn, tiles_mapping_model)
-        if not sided_square and self.current_profit > 20:
-            if not goal_enclosed:
-                recursive_map, list_possible_tiles = self._creating_goal_graph(goal, tiles_mapping_model, turn,
-                                                                               recursive_map={},
-                                                                               list_possible_tiles=[])
-                position_tile = self._looking_for_shortest_path(recursive_map, list_possible_tiles, goal)
-                self.presenter.calc_player_tile_exploration(*position_tile)
-                action = 1
+        if self.factory > 4 and sided_square:
+            action = 1
+            if self.cash >= goal_price and self.cash > minimum_price:
+                sb_end = True
                 return action, sb_end
-        elif self.cash > minimum_price:
-            sided_square, direction = surrounded_property(goal.x, goal.y, turn, tiles_mapping_model)
-            if self.factory > 4 and not goal_enclosed:
-                if sided_square:
-                    if self.cash >= goal_price and self.cash > minimum_price:
-                        sb_end = True
-                        action = 1
-                        return action, sb_end
-                    else:
-                        return action, sb_end
             else:
-                action = self._buying_a_factory()
+                return action, sb_end
 
-        elif (self.cash > factory_price and self.current_profit > (n_turns / 2)
-              and self.factory < 5):
+        elif not sided_square and self.current_profit > 20 and not goal_enclosed:
+            recursive_map, list_possible_tiles = self._creating_goal_graph(goal, tiles_mapping_model, turn,
+                                                                           recursive_map={},
+                                                                           list_possible_tiles=[])
+            position_tile = self._looking_for_shortest_path(recursive_map, list_possible_tiles, goal)
+            self.presenter.calc_player_tile_exploration(position_tile.x, position_tile.y)
+            action = 1
+            return action, sb_end
+        elif self.cash > minimum_price:
+            action = self._buying_a_factory()
+        elif self.cash > factory_price and self.current_profit > (n_turns / 2) and self.factory < 5:
             action = self._buying_a_factory()
             if action == 0:
                 action = self._exploring()
