@@ -31,14 +31,16 @@ class GamePresenter(Presenter):
         return self.model.board.tile_mapping[x][y]
 
     def calc_player_tile_exploration(self, tile_x, tile_y):
-        self.model.calc_player_tile_exploration(tile_x, tile_y)
-        tile = self.model.board.tile_mapping[tile_x][tile_y]
-        self.view.board.tile_mapping[tile_x][tile_y].set_colors(tile)
+        if self.get_current_player().cash >= self.get_game_parameters()['exploration_price']:
+            self.model.calc_player_tile_exploration(tile_x, tile_y)
+            tile = self.model.board.tile_mapping[tile_x][tile_y]
+            self.view.board.tile_mapping[tile_x][tile_y].set_colors(tile)
 
     def calc_player_factory_buy(self, tile_x, tile_y):
-        self.model.calc_player_factory_buy(tile_x, tile_y)
-        tile = self.model.board.tile_mapping[tile_x][tile_y]
-        self.view.board.tile_mapping[tile_x][tile_y].set_colors(tile)
+        if self.get_current_player().cash >= self.get_game_parameters()['factory_price']:
+            self.model.calc_player_factory_buy(tile_x, tile_y)
+            tile = self.model.board.tile_mapping[tile_x][tile_y]
+            self.view.board.tile_mapping[tile_x][tile_y].set_colors(tile)
 
     def end_turn(self):
         self.model.end_turn()
