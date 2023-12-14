@@ -257,26 +257,26 @@ class AI(Player):
                     wood += 1
         return wood
 
-    def _calculate_goal_enclosed(self, goal, list_property):
+    @staticmethod
+    def _calculate_goal_enclosed(goal, tile_mapping):
         goal_enclosed = False
         prop1 = 0
         prop2 = 0
-        y1 = max(goal[1] - 1, 0)
-        y2 = min(goal[1] + 1, board_size[1] - 1)
-        x1 = max(goal[0] - 1, 0)
-        x2 = min(goal[0] + 1, board_size[0] - 1)
+        x1, y1 = max(goal[0] - 1, 0), max(goal[1] - 1, 0)
+        x2, y2 = min(goal[0] + 1, board_size[0] - 1), min(goal[1] + 1, board_size[1] - 1)
+
         for iy in range(y1, y2):
-            sided_square1, direction1 = surrounded_property(goal[0], iy, 1, list_property)
+            sided_square1, direction1 = surrounded_property(goal[0], iy, 1, tile_mapping)
             if sided_square1:
                 prop1 += 1
-            sided_square2, direction2 = surrounded_property(goal[0], iy, 2, list_property)
+            sided_square2, direction2 = surrounded_property(goal[0], iy, 2, tile_mapping)
             if sided_square2:
                 prop2 += 1
         for ix in range(x1, x2):
-            sided_square1, direction1 = surrounded_property(ix, goal[1], 1, list_property)
+            sided_square1, direction1 = surrounded_property(ix, goal[1], 1, tile_mapping)
             if sided_square1:
                 prop1 += 1
-            sided_square2, direction2 = surrounded_property(ix, goal[1], 2, list_property)
+            sided_square2, direction2 = surrounded_property(ix, goal[1], 2, tile_mapping)
             if sided_square2:
                 prop2 += 1
         if prop1 == 4 or prop2 == 4:
