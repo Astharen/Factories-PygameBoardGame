@@ -101,7 +101,6 @@ class AI(Player):
         return tile_bought
 
     def movement(self):
-        action = 0
         sb_end = False
         tiles_mapping_model = self.presenter.get_tile_mapping()
         goal = self.presenter.get_goal()
