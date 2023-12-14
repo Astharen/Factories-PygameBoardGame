@@ -30,6 +30,9 @@ class GamePresenter(Presenter):
     def get_tile_from_position(self, x, y):
         return self.model.board.tile_mapping[x][y]
 
+    def get_goal(self):
+        return self.model.board.goal
+
     def calc_player_tile_exploration(self, tile_x, tile_y):
         if self.get_current_player().cash >= self.get_game_parameters()['exploration_price']:
             self.model.calc_player_tile_exploration(tile_x, tile_y)
