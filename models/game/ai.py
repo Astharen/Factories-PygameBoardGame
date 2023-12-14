@@ -202,30 +202,13 @@ class AI(Player):
             cash[str(turn)] -= exploration_price
         return list_property, list_color_map, wood, cash, current_profit
 
-    def _buying_a_factory(self, turn, list_color_map, factory, factory_price, cash, current_profit,
-                          factory_profit, list_property, wood):
-        bought_factory = False
-        for y_prop in range(board_size[1]):
-            for x_prop in range(board_size[0]):
-                if list_property[y_prop][x_prop] == str(turn) and not bought_factory and list_color_map[y_prop][
-                    x_prop] == '0':
-                    list_color_map[y_prop][x_prop] = '2'
-                    cash[str(turn)] -= factory_price
-                    current_profit[str(turn)] += factory_profit
-                    factory[str(turn)] += 1
-                    bought_factory = True
-        if not bought_factory:
-            for y_prop in range(board_size[1]):
-                for x_prop in range(board_size[0]):
-                    if list_property[y_prop][x_prop] == str(turn) and not bought_factory and list_color_map[y_prop][
-                        x_prop] == '1':
-                        list_color_map[y_prop][x_prop] = '2'
-                        cash[str(turn)] -= factory_price
-                        current_profit[str(turn)] += factory_profit
-                        factory[str(turn)] += 1
-                        bought_factory = True
-                        wood[str(turn)] -= 1
-        return list_property, list_color_map, cash, current_profit, factory, wood, bought_factory
+    def _buying_a_factory(self):
+        if len(self.owned_tiles) == 0 or self.cash < self.presenter.get_game_parameters['factory_price']:
+            return 0
+        tile_to_buy = self.owned_tiles[0]
+        for tile in self.owned_tiles:
+            if tile_to_buy.type == 'wood' and tile.type == 'nothing':
+                tile_to_buy = tile
 
     def _get_possible_square(self, list_property, list_color_map, turn):
         possible_squares = {'0': [], '1': []}
