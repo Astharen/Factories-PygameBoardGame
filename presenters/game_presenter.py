@@ -1,7 +1,14 @@
 from abstract_classes.presenter import Presenter
+from models.game.ai import AI
 
 
 class GamePresenter(Presenter):
+
+    def __init__(self, model, app):
+        super().__init__(model, app)
+        for player in self.model.players:
+            if isinstance(player, AI):
+                player.set_presenter(self)
 
     def get_tile_mapping(self):
         return self.model.board.tile_mapping

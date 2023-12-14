@@ -5,8 +5,11 @@ from models.game.player import Player
 
 class AI(Player):
 
-    def __init__(self, name, presenter):
+    def __init__(self, name):
         super().__init__(name)
+        self.presenter = None
+
+    def set_presenter(self, presenter):
         self.presenter = presenter
 
     def _creating_goal_graph(self, goal, tile_mapping, turn, recursive_map, list_possible_tiles):

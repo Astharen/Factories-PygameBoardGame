@@ -1,6 +1,7 @@
 import json
 import random
 
+from models.game.ai import AI
 from models.game.player import Player
 from models.game.board_model import BoardModel
 
@@ -31,7 +32,10 @@ class GameModel:
 
     def set_players(self, vs_ai):
         self.add_player(Player('player1'))
-        self.add_player(Player('player2'))
+        if not vs_ai:
+            self.add_player(Player('player2'))
+        else:
+            self.add_player(AI('player2'))
 
         initial_tiles = []
 
