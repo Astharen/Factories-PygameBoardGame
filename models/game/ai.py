@@ -193,12 +193,17 @@ class AI(Player):
         if len(self.owned_tiles) == 0 or self.cash < self.presenter.get_game_parameters()['factory_price']:
             return 0
         tile_to_buy = self.owned_tiles[0]
-        for tile in self.owned_tiles:
-            if tile_to_buy.type == 'wood' and tile.type == 'nothing':
+        action = 0
+        for tile in self.owned_tiles[1:]:
+            if tile.type != 'factory' and tile_to_buy.type == 'factory':
                 tile_to_buy = tile
+                action = 1
+            elif tile_to_buy.type == 'wood' and tile.type == 'nothing':
+                tile_to_buy = tile
+                action = 1
 
         self.presenter.calc_player_factory_buy(tile_to_buy.x, tile_to_buy.y)
-        return 1
+        return action
 
     def _get_possible_square(self):
         tile_mapping_model = self.presenter.get_tile_mapping()
