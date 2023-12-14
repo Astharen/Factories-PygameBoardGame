@@ -210,16 +210,21 @@ class AI(Player):
             if tile_to_buy.type == 'wood' and tile.type == 'nothing':
                 tile_to_buy = tile
 
-    def _get_possible_square(self, list_property, list_color_map, turn):
-        possible_squares = {'0': [], '1': []}
+        self.presenter.calc_player_factory_buy(tile_to_buy.x, tile_to_buy.y)
+        return 1
+
+    def _get_possible_square(self):
+        tile_mapping_model = self.presenter.get_tile_mapping()
+        possible_squares = {'nothing': [], 'wood': []}
         directions = {'0': [], '1': []}
-        for y in range(board_size[1]):
-            for x in range(board_size[0]):
-                if list_property[y][x] == '0':
-                    sided_square, direction = surrounded_property(x, y, turn, list_property)
+        for x in range(board_size[0]):
+            for y in range(board_size[1]):
+                if tile_mapping_model[x][y].owner == 'nothing':
+                    turn = self.presenter.get_turn()
+                    sided_square, direction = surrounded_property(x, y, turn, tile_mapping_model)
                     if sided_square:
-                        possible_squares[list_color_map[y][x]].append([x, y])
-                        directions[list_color_map[y][x]].append(direction)
+                        possible_squares[tile_mapping_model[x][y].type].append((x, y))
+                        directions[tile_mapping_model[x][y].type].append(direction)
         return possible_squares, directions
 
     def _calc_region_with_more_wood(self, x, y, direction, list_color_map, list_property):
