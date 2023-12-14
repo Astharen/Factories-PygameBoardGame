@@ -1,1 +1,0 @@
-{"factory_price": 40, "exploration_price": 10, "wood_profit": 5, "factory_profit": 10, "initial_cash": 50, "goal_price": 300}
