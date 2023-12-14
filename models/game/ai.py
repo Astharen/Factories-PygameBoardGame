@@ -85,11 +85,11 @@ class AI(Player):
 
     @staticmethod
     def _looking_for_shortest_path(recursive_map, list_possible_tiles, goal):
-        min_path = 0
+        min_path = 1000
         tile_bought = None
 
         for idx, tile in enumerate(list_possible_tiles):
-            new_path = AI._bfs_shortest_path(recursive_map, start=goal, goal=tile)
+            new_path = AI._bfs_shortest_path(recursive_map, start=(goal.x, goal.y), goal=(tile.x, tile.y))
             len_path = len(new_path)
             if len_path == 0:
                 tile_bought = None
